@@ -113,6 +113,18 @@ export type ArtistProfilePreview = {
   youtube: string[];
 };
 
+export type ClubProfilePreview = {
+  userId: string;
+  name: string;
+  city: string;
+  summary: string;
+  capacity: string;
+  availableDates: Array<{
+    date: string;
+    lookingFor: string;
+  }>;
+};
+
 function loadMockData(): MockData {
   if (cachedMockData) {
     return cachedMockData;
@@ -231,4 +243,31 @@ export function getArtistByUserIdFromMock(userId: string): ArtistProfilePreview 
 export function getArtistUserIdsFromMock(): string[] {
   const data = loadMockData();
   return (data.artists ?? []).map((artist) => artist.user_id ?? "").filter(Boolean);
+}
+
+export function getClubByUserIdFromMock(userId: string): ClubProfilePreview | null {
+  try {
+    const data = loadMockData();
+    const club = (data.clubs ?? []).find((item) => item.user_id === userId);
+
+    if (!club) {
+      return null;
+    }
+
+    return {
+      userId: club.user_id ?? "",
+      name: club.name,
+      city: club.city,
+      summary: club.summary ?? "No summary provided",
+      capacity: club.capacity ? String(club.capacity) : "Not listed",
+      availableDates: club.availableDates ?? [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function getClubUserIdsFromMock(): string[] {
+  const data = loadMockData();
+  return (data.clubs ?? []).map((club) => club.user_id ?? "").filter(Boolean);
 }

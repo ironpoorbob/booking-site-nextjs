@@ -5,6 +5,7 @@ import { Suspense, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { artistTypeLabel, clubBookerTypeLabel, genreOptions } from "./options";
 import ArtistInquiryList from "./ArtistInquiryList";
+import BookingInquiryList from "./BookingInquiryList";
 import { getProfileFallbackFromMock, getSearchResultsFromMock } from "./mock-data";
 import {
   getAccountTypeFromSearchParams,
@@ -20,9 +21,18 @@ const artistAvailability = [
 ];
 
 const artistInquiries = [
-  "The Rusted Rail: Looking for a Friday rock set (Apr 10)",
-  "Midnight Lantern: 45-minute opening slot inquiry",
-  "Blacklight Social: Wants a summer residency",
+  {
+    clubUserId: "club_001",
+    note: "Looking for a Friday rock set on Apr 10.",
+  },
+  {
+    clubUserId: "club_002",
+    note: "Requested a 45-minute opening slot for a weekend bill.",
+  },
+  {
+    clubUserId: "club_003",
+    note: "Interested in a summer residency if dates align.",
+  },
 ];
 
 const clubAvailability = [
@@ -75,6 +85,16 @@ function DashboardPageContent() {
   const youtubeLinks = profile.youtubeLinks.filter(Boolean);
 
   const availabilityItems = profile.accountType === "artist" ? artistAvailability : clubAvailability;
+  const allClubResults = getSearchResultsFromMock("artist");
+  const artistInquiryEntries = artistInquiries
+    .map((inquiry) => ({
+      note: inquiry.note,
+      club: allClubResults.find((club) => club.userId === inquiry.clubUserId),
+    }))
+    .filter((entry): entry is { note: string; club: (typeof allClubResults)[number] } =>
+      Boolean(entry.club),
+    );
+
   const allArtistResults = getSearchResultsFromMock("club-booker");
   const inquiryEntries = clubInquiries
     .map((inquiry) => ({
@@ -244,13 +264,7 @@ function DashboardPageContent() {
             {profile.accountType === "artist" ? "Booking Inquiries" : "Artist Inquiries"}
           </h2>
           {profile.accountType === "artist" ? (
-            <ul className="mt-4 space-y-3">
-              {artistInquiries.map((item) => (
-                <li key={item} className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-zinc-200">
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <BookingInquiryList inquiries={artistInquiryEntries} profileQuery={profileQuery} />
           ) : (
             <ArtistInquiryList
               inquiries={inquiryEntries}
