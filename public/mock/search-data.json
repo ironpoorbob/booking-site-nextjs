@@ -1,0 +1,206 @@
+{
+  "artists": [
+    {
+      "user_id": "artist_001",
+      "accountType": "artist",
+      "name": "Decal",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Alternative/Indie", "Punk", "Pop"],
+      "artistDescription": "Decal is a dynamic alternative band blending punk energy with indie melodies. Known for their high-energy performances and catchy hooks, they have quickly gained a dedicated following in the local music scene.",
+      "city": "San Francisco",
+      "summary": "New album out, looking for local shows",
+      "website": "https://example.com/decal",
+      "spotify": "",
+      "audioFileUpload": "https://example.com/decalsample.mp3",
+      "bandPicUrl": "https://example.com/decal-band-photo.jpg",
+      "youtube": [
+        "https://www.youtube.com/watch?v=example1",
+        "https://www.youtube.com/watch?v=example2"
+      ]
+    },
+    {
+      "user_id": "artist_002",
+      "accountType": "artist",
+      "name": "Stone Echo",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Alternative/Indie", "Punk", "Pop"],
+      "city": "Los Angeles",
+      "artistDescription": "Stone Echo is an alternative indie band with a punk edge. Their sound is characterized by driving rhythms and introspective lyrics.",
+      "summary": "Available April weekends",
+      "website": "https://example.com/stoneecho",
+      "spotify": "https://open.spotify.com/artist/example",
+      "audioFileUpload": "https://example.com/stoneechosample.mp3",
+      "bandPicUrl": "https://example.com/stone-echo-band-photo.jpg",
+      "youtube": [
+        "https://www.youtube.com/watch?v=example3"
+      ]
+    },
+    {
+      "user_id": "artist_003",
+      "accountType": "artist",
+      "name": "Midnight Static",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Punk"],
+      "city": "Long Beach",
+      "artistDescription": "Midnight Static is a high-energy punk band known for their raw sound and electrifying live shows. With a growing fanbase, they are eager to hit the stage and share their music with new audiences.",
+      "summary": "Touring support slots open",
+      "website": "https://example.com/midnightstatic",
+      "spotify": "https://open.spotify.com/artist/example",
+      "audioFileUpload": "https://example.com/midnightstaticsample.mp3",
+      "bandPicUrl": "",
+      "youtube": []
+    },
+    {
+      "user_id": "artist_004",
+      "accountType": "artist",
+      "name": "Velvet Voltage",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Indie Rock"],
+      "city": "Orange County",
+      "artistDescription": "Velvet Voltage is an indie rock band known for their melodic sound and thoughtful lyrics. They bring a fresh perspective to the genre with their unique approach to songwriting and performance.",
+      "summary": "45 minute set",
+      "website": "https://example.com/velvetvoltage",
+      "spotify": "https://open.spotify.com/artist/example",
+      "audioFileUpload": "https://example.com/velvetvoltagesample.mp3",
+      "bandPicUrl": "",
+      "youtube": []
+    },
+    {
+      "user_id": "artist_005",
+      "accountType": "artist",
+      "name": "Clark Nova",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Alternative/Indie", "Punk"],
+      "artistDescription": "Clark Nova is a dynamic alternative band blending punk energy with indie melodies. Known for their high-energy performances and catchy hooks, they have quickly gained a dedicated following in the local music scene.",
+      "city": "San Francisco",
+      "summary": "Scaring up some local shows",
+      "website": "https://example.com/clarknova",
+      "spotify": "",
+      "audioFileUpload": "https://example.com/clarknovasample.mp3",
+      "bandPicUrl": "https://example.com/clark-nova-band-photo.jpg",
+      "youtube": [
+        "https://www.youtube.com/watch?v=example1",
+        "https://www.youtube.com/watch?v=example2"
+      ]
+    }
+  ],
+  "clubs": [
+    {
+      "user_id": "club_001",
+      "accountType": "club-booker",
+      "name": "The Velvet Room",
+      "city": "Hollywood",
+      "capacity": 350,
+      "summary": "Books Friday and Saturday showcases",
+      "availableDates": [
+        {
+          "date": "2026-04-10",
+          "lookingFor": "Indie/Alternative headliner"
+        },
+        {
+          "date": "2026-04-18",
+          "lookingFor": "Acoustic duo for early set"
+        }
+      ]
+    },
+    {
+      "user_id": "club_002",
+      "accountType": "club-booker",
+      "name": "Riot Alley",
+      "city": "Downtown LA",
+      "capacity": 220,
+      "summary": "Weekly live lineups",
+      "availableDates": [
+        {
+          "date": "2026-04-03",
+          "lookingFor": "Punk band for late slot"
+        },
+        {
+          "date": "2026-04-24",
+          "lookingFor": "Rock opener with 30-40 min set"
+        }
+      ]
+    },
+    {
+      "user_id": "club_003",
+      "accountType": "club-booker",
+      "name": "Neon Club",
+      "city": "Long Beach",
+      "capacity": 500,
+      "summary": "Alternative and hard rock focused",
+      "availableDates": [
+        {
+          "date": "2026-04-11",
+          "lookingFor": "Hard rock co-headliner"
+        },
+        {
+          "date": "2026-05-02",
+          "lookingFor": "Indie rock support act"
+        }
+      ]
+    },
+    {
+      "user_id": "club_004",
+      "accountType": "club-booker",
+      "name": "Bottom of the Hill",
+      "city": "San Francisco",
+      "capacity": 250,
+      "summary": "Independent live music venue in Potrero Hill",
+      "availableDates": [
+        {
+          "date": "2026-04-09",
+          "lookingFor": "Local indie band for weeknight bill"
+        },
+        {
+          "date": "2026-04-23",
+          "lookingFor": "Alt/punk trio for co-bill"
+        }
+      ]
+    },
+    {
+      "user_id": "club_005",
+      "accountType": "club-booker",
+      "name": "Kilowatt",
+      "city": "San Francisco",
+      "capacity": 180,
+      "summary": "Mission venue known for local and touring acts",
+      "availableDates": [
+        {
+          "date": "2026-04-15",
+          "lookingFor": "Punk or garage rock act"
+        },
+        {
+          "date": "2026-05-06",
+          "lookingFor": "Experimental/electronic crossover act"
+        }
+      ]
+    },
+    {
+      "user_id": "club_006",
+      "accountType": "club-booker",
+      "name": "Glen Park Station",
+      "city": "San Francisco",
+      "capacity": 90,
+      "summary": "Neighborhood bar hosting small live sets and local showcases",
+      "availableDates": [
+        {
+          "date": "2026-04-05",
+          "lookingFor": "Solo acoustic artist for Sunday set"
+        },
+        {
+          "date": "2026-04-19",
+          "lookingFor": "Small duo/trio with low-volume setup"
+        },
+        {
+          "date": "2026-05-03",
+          "lookingFor": "Indie singer-songwriter for early evening"
+        }
+      ]
+    }
+  ]
+}

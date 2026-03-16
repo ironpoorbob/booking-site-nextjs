@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050506;
+  --foreground: #f7f7f7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+}
+
+body {
+  color-scheme: dark;
+  background: #050506;
+  color: var(--foreground);
+  font-family: var(--font-body), sans-serif;
+  min-height: 100vh;
+}
+
+.noise-bg {
+  background: #050506;
+}
+
+.font-display {
+  font-family: var(--font-display), sans-serif;
+}
+
+.site-nav-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.site-nav {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(8, 8, 9, 0.96);
+  backdrop-filter: blur(8px);
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: 0.05em;
+  font-size: 1.3rem;
+  color: #f3f3f3;
+}
+
+.site-nav-link {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: #f3f3f3;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.45rem 0.7rem;
+}
+
+.site-nav-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: #1f242b;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.3rem;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: #2a3039;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #f5f5f5;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.3rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.form-group {
+  display: block;
+}
+
+.form-group > span {
+  display: block;
+  color: #f5f5f5;
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+}
+
+.form-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.23);
+  border-radius: 0.75rem;
+  color: #fff;
+  padding: 0.75rem 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+  border-color: rgba(249, 91, 47, 0.8);
+  box-shadow: 0 0 0 3px rgba(249, 91, 47, 0.2);
+}
+
+.role-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 8px;
+  color: #ececec;
+  padding: 0.48rem 0.8rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.role-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 12px;
+  padding: 0.55rem;
+  background: rgba(255, 255, 255, 0.02);
+}
