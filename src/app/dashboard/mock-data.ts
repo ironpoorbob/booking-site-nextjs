@@ -5,6 +5,7 @@ type MockArtist = {
   user_id?: string;
   accountType?: string;
   name: string;
+  email?: string;
   city: string;
   genre?: string | string[];
   summary?: string;
@@ -17,6 +18,7 @@ type MockClub = {
   user_id?: string;
   accountType?: string;
   name: string;
+  email?: string;
   city: string;
   capacity?: number;
   summary?: string;
@@ -92,6 +94,7 @@ export type SearchResult = {
   city: string;
   summary: string;
   meta: string;
+  email?: string;
   genres?: string[];
   artistDescription?: string;
   bandPicUrl?: string;
@@ -148,6 +151,7 @@ export function getProfileFallbackFromMock(accountType: AccountType): ProfileFal
       return {
         userId: firstArtist.user_id ?? "artist_mock_001",
         realName: firstArtist.name,
+        email: firstArtist.email ?? "artist@gmail.com",
         location: firstArtist.city,
         bandName: firstArtist.name,
         artistType: "musician-band",
@@ -169,11 +173,12 @@ export function getProfileFallbackFromMock(accountType: AccountType): ProfileFal
     return {
       userId: firstClub.user_id ?? "club_mock_001",
       realName: firstClub.name,
+      email: firstClub.email ?? "club@gmail.com",
       location: firstClub.city,
       venueName: firstClub.name,
       clubBookerType: "venue-club",
       venueCapacity: firstClub.capacity ? String(firstClub.capacity) : "Not set",
-      bookingContactEmail: "bookings@example.com",
+      bookingContactEmail: firstClub.email ?? "bookings@gmail.com",
       typicalBookingNights: "Thursday, Friday, Saturday",
       clubGenres: [],
       artistNotes: firstClub.summary ?? "Share stage expectations and production details.",
@@ -194,6 +199,7 @@ export function getSearchResultsFromMock(accountType: AccountType): SearchResult
         city: club.city,
         summary: club.summary ?? "No summary provided",
         meta: club.capacity ? `Capacity: ${club.capacity}` : "Capacity not listed",
+        email: club.email,
         availableDates: club.availableDates ?? [],
       }));
     }
@@ -206,6 +212,7 @@ export function getSearchResultsFromMock(accountType: AccountType): SearchResult
       meta: artist.genre
         ? `Genre: ${Array.isArray(artist.genre) ? artist.genre.join(", ") : artist.genre}`
         : "Genre not listed",
+      email: artist.email,
       genres: normalizeMockGenres(artist.genre),
       artistDescription: artist.artistDescription ?? "",
       bandPicUrl: artist.bandPicUrl ?? "",
