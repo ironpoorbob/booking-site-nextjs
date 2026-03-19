@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useMemo, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { withBasePath } from "@/lib/base-path";
 import { getProfileFallbackFromMock, getSearchResultsFromMock } from "../mock-data";
-import { genreOptions } from "../options";
+import { artistTypeOptions, genreOptions } from "../options";
 import {
   getAccountTypeFromSearchParams,
   parseProfileFromSearchParams,
@@ -41,6 +41,68 @@ function matchesSelectedGenre(genres: string[] | undefined, selectedGenres: Set<
   return normalizedGenres.some((genre) => selectedGenres.has(genre));
 }
 
+function normalizeText(value: string): string {
+  return value.toLowerCase();
+}
+
+function matchesNeedGenre(lookingFor: string, selectedGenres: Set<string>): boolean {
+  if (selectedGenres.size === 0) {
+    return true;
+  }
+
+  const value = normalizeText(lookingFor);
+
+  return Array.from(selectedGenres).some((genre) => {
+    switch (genre) {
+      case "alternative-indie":
+        return value.includes("alternative") || value.includes("indie") || value.includes("alt");
+      case "electronic-edm":
+        return value.includes("electronic") || value.includes("edm");
+      case "hip-hop-rap":
+        return value.includes("hip-hop") || value.includes("hip hop") || value.includes("rap");
+      case "rnb-soul":
+        return value.includes("r&b") || value.includes("rnb") || value.includes("soul");
+      default:
+        return value.includes(genre.replace("-", " "));
+    }
+  });
+}
+
+function matchesNeedArtistType(lookingFor: string, artistType: string): boolean {
+  if (!artistType || artistType === "musician-band") {
+    return true;
+  }
+
+  const value = normalizeText(lookingFor);
+
+  if (artistType === "dj") {
+    return value.includes("dj");
+  }
+  if (artistType === "comedian") {
+    return value.includes("comedian") || value.includes("comedy");
+  }
+  if (artistType === "magician") {
+    return value.includes("magician") || value.includes("magic");
+  }
+  if (artistType === "trivia-host") {
+    return value.includes("trivia");
+  }
+
+  return true;
+}
+
+function isNeedWithinDateRange(date: string, dateFrom: string, dateTo: string): boolean {
+  if (dateFrom && date < dateFrom) {
+    return false;
+  }
+
+  if (dateTo && date > dateTo) {
+    return false;
+  }
+
+  return true;
+}
+
 function formatNeedDate(dateString: string): { label: string; iso: string } {
   const parsed = new Date(`${dateString}T00:00:00`);
 
@@ -57,7 +119,17 @@ function formatNeedDate(dateString: string): { label: string; iso: string } {
 }
 
 function SearchPageContent() {
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [selectedClubNeed, setSelectedClubNeed] = useState<{
+    clubUserId: string;
+    clubName: string;
+    city: string;
+    summary: string;
+    meta: string;
+    date: string;
+    lookingFor: string;
+  } | null>(null);
 
   const raw = useMemo(
     () => toRawSearchParams(new URLSearchParams(searchParams.toString())),
@@ -76,11 +148,42 @@ function SearchPageContent() {
   const use24HourClock = readFirst(raw.showClock24) === "1";
   const hasSubmittedSearch = readFirst(raw.submitted) === "1";
   const selectedGenres = new Set(readList(raw.genres));
+  const artistSearchType = readFirst(raw.artistSearchType) || profile.artistType;
+  const musicTypeFilters = new Set(readList(raw.musicTypes));
+  const dateFrom = readFirst(raw.dateFrom);
+  const dateTo = readFirst(raw.dateTo);
   const allResults = getSearchResultsFromMock(profile.accountType);
   const isArtistSearch = profile.accountType === "club-booker";
 
-  const filteredResults = allResults.filter((result) => {
+  const filteredResults = allResults
+    .map((result) => {
+      if (isArtistSearch) {
+        return result;
+      }
+
+      const filteredNeeds = (result.availableDates ?? []).filter((need) => {
+        if (!matchesNeedArtistType(need.lookingFor, artistSearchType)) {
+          return false;
+        }
+
+        if (!matchesNeedGenre(need.lookingFor, musicTypeFilters)) {
+          return false;
+        }
+
+        return isNeedWithinDateRange(need.date, dateFrom, dateTo);
+      });
+
+      return {
+        ...result,
+        availableDates: filteredNeeds,
+      };
+    })
+    .filter((result) => {
     if (isArtistSearch && !hasSubmittedSearch) {
+      return false;
+    }
+
+    if (!isArtistSearch && !hasSubmittedSearch) {
       return false;
     }
 
@@ -95,7 +198,14 @@ function SearchPageContent() {
     }
 
     if (!isArtistSearch) {
-      return true;
+      const hasActiveClubFilters =
+        musicTypeFilters.size > 0 || Boolean(dateFrom) || Boolean(dateTo) || artistSearchType !== "musician-band";
+
+      if (!hasActiveClubFilters) {
+        return true;
+      }
+
+      return (result.availableDates?.length ?? 0) > 0;
     }
 
     return matchesSelectedGenre(result.genres, selectedGenres);
@@ -108,6 +218,24 @@ function SearchPageContent() {
       : `Find artists and bands for your upcoming dates at ${profile.venueName}.`;
 
   const dashboardHref = `/dashboard?${toSearchString(profile)}`;
+  const returnTo = useMemo(() => {
+    const query = searchParams.toString();
+    return query ? `${pathname}?${query}` : pathname;
+  }, [pathname, searchParams]);
+  const selectedClubRequestHref = useMemo(() => {
+    if (!selectedClubNeed) {
+      return "";
+    }
+
+    const params = new URLSearchParams();
+    params.set("requestType", "club");
+    params.set("artistName", profile.bandName !== "Not set" ? profile.bandName : profile.realName);
+    params.set("clubName", selectedClubNeed.clubName);
+    params.set("showDate", selectedClubNeed.date);
+    params.set("setInfo", selectedClubNeed.lookingFor);
+    params.set("returnTo", returnTo);
+    return `/dashboard/book/thanks?${params.toString()}`;
+  }, [profile.bandName, profile.realName, returnTo, selectedClubNeed]);
 
   return (
     <main className="min-h-screen py-10">
@@ -188,6 +316,29 @@ function SearchPageContent() {
               </>
             ) : null}
 
+            {!isArtistSearch ? (
+              <>
+                <label className="form-group w-full sm:w-auto">
+                  <span>Artist Type</span>
+                  <select className="form-input" name="artistSearchType" defaultValue={artistSearchType}>
+                    {artistTypeOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="form-group w-full sm:w-auto">
+                  <span>Date From</span>
+                  <input className="form-input" name="dateFrom" type="date" defaultValue={dateFrom} />
+                </label>
+                <label className="form-group w-full sm:w-auto">
+                  <span>Date To</span>
+                  <input className="form-input" name="dateTo" type="date" defaultValue={dateTo} />
+                </label>
+              </>
+            ) : null}
+
             {isArtistSearch ? (
               <fieldset className="mt-3 w-full rounded-xl border border-white/15 bg-black/35 p-4">
                 <legend className="px-1 text-sm font-semibold tracking-[0.08em] text-zinc-300 uppercase">
@@ -208,10 +359,31 @@ function SearchPageContent() {
                 </div>
               </fieldset>
             ) : null}
+
+            {!isArtistSearch ? (
+              <fieldset className="mt-3 w-full rounded-xl border border-white/15 bg-black/35 p-4">
+                <legend className="px-1 text-sm font-semibold tracking-[0.08em] text-zinc-300 uppercase">
+                  Music Type
+                </legend>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {genreOptions.map((option) => (
+                    <label key={option.value} className="inline-flex items-center gap-2 text-zinc-100">
+                      <input
+                        type="checkbox"
+                        name="musicTypes"
+                        value={option.value}
+                        defaultChecked={musicTypeFilters.has(option.value)}
+                      />
+                      {option.label}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ) : null}
           </form>
         </section>
 
-        {!isArtistSearch || hasSubmittedSearch ? (
+        {hasSubmittedSearch ? (
           <section className="rounded-2xl border border-white/15 bg-black/70 p-6 md:p-8">
             <h2 className="font-display text-3xl tracking-wider text-white">Results</h2>
             {isArtistSearch ? (
@@ -235,12 +407,28 @@ function SearchPageContent() {
                               return (
                                 <li
                                   key={`${need.date}-${need.lookingFor}`}
-                                  className="rounded-md border border-white/15 bg-black/40 px-3 py-2"
+                                  className="rounded-md border border-white/15 bg-black/40"
                                 >
-                                  <span className="font-semibold text-zinc-100">{formatted.label}</span>
-                                  <span className="ml-1 text-xs text-zinc-400">({formatted.iso})</span>
-                                  <span className="text-zinc-300">{" - "}</span>
-                                  <span>{need.lookingFor}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setSelectedClubNeed({
+                                        clubUserId: result.userId,
+                                        clubName: result.name,
+                                        city: result.city,
+                                        summary: result.summary,
+                                        meta: result.meta,
+                                        date: need.date,
+                                        lookingFor: need.lookingFor,
+                                      })
+                                    }
+                                    className="w-full px-3 py-2 text-left transition-colors hover:bg-white/5"
+                                  >
+                                    <span className="font-semibold text-zinc-100">{formatted.label}</span>
+                                    <span className="ml-1 text-xs text-zinc-400">({formatted.iso})</span>
+                                    <span className="text-zinc-300">{" - "}</span>
+                                    <span>{need.lookingFor}</span>
+                                  </button>
                                 </li>
                               );
                             })}
@@ -257,6 +445,55 @@ function SearchPageContent() {
           </section>
         ) : null}
       </div>
+
+      {selectedClubNeed ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true">
+          <div className="w-full max-w-2xl rounded-2xl border border-white/20 bg-zinc-950 p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs tracking-[0.15em] text-zinc-400 uppercase">Club Booking Need</p>
+                <h3 className="mt-1 font-display text-4xl tracking-wider text-white">
+                  {selectedClubNeed.clubName}
+                </h3>
+                <p className="mt-1 text-zinc-300">{selectedClubNeed.city}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedClubNeed(null)}
+                className="rounded-md px-2 py-1 font-display text-3xl leading-none font-bold text-zinc-200 transition-colors hover:bg-white/10 hover:text-white"
+                aria-label="Close club booking need"
+              >
+                X
+              </button>
+            </div>
+
+            <div className="mt-5 rounded-xl border border-white/10 bg-black/40 p-4">
+              <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Requested Date</p>
+              <p className="mt-1 font-semibold text-zinc-100">
+                {formatNeedDate(selectedClubNeed.date).label}
+              </p>
+              <p className="mt-1 text-sm text-zinc-400">{selectedClubNeed.date}</p>
+            </div>
+
+            <div className="mt-4 rounded-xl border border-white/10 bg-black/40 p-4">
+              <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Looking For</p>
+              <p className="mt-1 text-zinc-200">{selectedClubNeed.lookingFor}</p>
+            </div>
+
+            <p className="mt-4 text-zinc-200">{selectedClubNeed.summary}</p>
+            <p className="mt-3 text-sm text-zinc-400">{selectedClubNeed.meta}</p>
+
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+              <Link className="btn-secondary" href={`/dashboard/club/${selectedClubNeed.clubUserId}`}>
+                View Profile
+              </Link>
+              <Link className="btn-primary ml-auto" href={selectedClubRequestHref}>
+                Send Booking Request
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

@@ -45,10 +45,12 @@ function formatShowTime(value: string): string {
 export default function ThankYouClient() {
   const searchParams = useSearchParams();
 
+  const requestType = searchParams.get("requestType")?.trim() || "artist";
   const artistName = searchParams.get("artistName")?.trim() || "this artist";
   const clubName = searchParams.get("clubName")?.trim() || "your club";
   const showDate = formatShowDate(searchParams.get("showDate")?.trim() ?? "");
   const setTime = searchParams.get("setInfo")?.trim() || formatShowTime(searchParams.get("showTime")?.trim() ?? "");
+  const isClubRequest = requestType === "club";
 
   const returnTo = useMemo(() => {
     const value = searchParams.get("returnTo");
@@ -65,10 +67,14 @@ export default function ThankYouClient() {
         <p className="text-xs tracking-[0.15em] text-zinc-400 uppercase">Booking Request Sent</p>
         <h1 className="mt-2 font-display text-5xl tracking-wider text-white">Thank You</h1>
         <p className="mt-4 text-zinc-200">
-          Your booking request has been submitted. An email will come with the band contact information.
+          {isClubRequest
+            ? "Your booking request has been submitted. The club can review your request and respond with next steps."
+            : "Your booking request has been submitted. An email will come with the band contact information."}
         </p>
         <p className="mt-3 text-zinc-200">
-          You&apos;ve requested to book {artistName} at {clubName} on {showDate}. Set time will be {setTime}.
+          {isClubRequest
+            ? `You've requested a booking opportunity with ${clubName} for ${showDate}. Requested need: ${setTime}. Artist: ${artistName}.`
+            : `You've requested to book ${artistName} at ${clubName} on ${showDate}. Set time will be ${setTime}.`}
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">

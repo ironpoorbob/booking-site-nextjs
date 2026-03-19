@@ -11,7 +11,7 @@ export default function UnauthLayout({
     <>
       <header className="site-nav-wrap">
         <nav className="site-nav w-full">
-          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-2">
+          <div className="mx-auto flex w-full max-w-4xl items-center justify-between py-2">
             <Link className="site-brand" href="/">
               <Image
                 src={withBasePath("/book-em-danno-logo.png")}

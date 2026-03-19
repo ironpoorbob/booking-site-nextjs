@@ -34,12 +34,11 @@ export default function ArtistSearchResults({ results, profileQuery }: ArtistSea
 
     const params = new URLSearchParams();
     const profileParams = new URLSearchParams(profileQuery);
-
-    profileParams.forEach((value, key) => {
-      params.append(key, value);
-    });
-
+    const clubName = profileParams.get("venueName") ?? "your club";
     params.set("returnTo", returnTo);
+    params.set("requestType", "artist");
+    params.set("artistName", selectedArtist.name);
+    params.set("clubName", clubName);
 
     if (showDate) {
       params.set("showDate", showDate);
@@ -49,7 +48,7 @@ export default function ArtistSearchResults({ results, profileQuery }: ArtistSea
       params.set("showTime", showTime);
     }
 
-    return `/dashboard/book/${selectedArtist.userId}?${params.toString()}`;
+    return `/dashboard/book/thanks?${params.toString()}`;
   }, [profileQuery, returnTo, selectedArtist, showDate, showTime]);
 
   return (
@@ -86,9 +85,10 @@ export default function ArtistSearchResults({ results, profileQuery }: ArtistSea
               <button
                 type="button"
                 onClick={() => setSelectedUserId(null)}
-                className="rounded-md border border-white/25 px-3 py-1 text-sm text-zinc-200 hover:bg-white/10"
+                className="rounded-md px-2 py-1 font-display text-3xl leading-none font-bold text-zinc-200 transition-colors hover:bg-white/10 hover:text-white"
+                aria-label="Close artist preview"
               >
-                Close
+                X
               </button>
             </div>
 
@@ -96,14 +96,11 @@ export default function ArtistSearchResults({ results, profileQuery }: ArtistSea
             <p className="mt-3 text-sm text-zinc-400">{selectedArtist.meta}</p>
 
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-              <Link
-                className="btn-primary"
-                href={bookingHref}
-              >
-                Book This Artist
-              </Link>
-              <Link className="btn-secondary ml-auto" href={`/dashboard/artist/${selectedArtist.userId}`}>
+              <Link className="btn-secondary" href={`/dashboard/artist/${selectedArtist.userId}`}>
                 View Profile
+              </Link>
+              <Link className="btn-primary ml-auto" href={bookingHref}>
+                Send Booking Request
               </Link>
             </div>
           </div>
