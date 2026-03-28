@@ -92,6 +92,146 @@
         "https://www.youtube.com/watch?v=example1",
         "https://www.youtube.com/watch?v=example2"
       ]
+    },
+    {
+      "user_id": "artist_006",
+      "accountType": "artist",
+      "name": "Carlos",
+      "email": "carlosband.sf@gmail.com",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Pop", "Rock", "Punk"],
+      "artistDescription": "Carlos is a San Francisco band blending pop hooks, gritty guitars, and punk urgency into melodic songs built for singalongs and packed rooms. Their live set leans energetic, catchy, and a little rough around the edges in the best way.",
+      "city": "San Francisco",
+      "summary": "Melodic pop-rock punk band looking for Bay Area and West Coast club dates",
+      "website": "https://example.com/carlos",
+      "spotify": "https://open.spotify.com/artist/examplecarlos",
+      "audioFileUpload": "https://example.com/carlossample.mp3",
+      "bandPicUrl": "https://example.com/carlos-band-photo.jpg",
+      "youtube": [
+        "https://www.youtube.com/watch?v=carloslive1",
+        "https://www.youtube.com/watch?v=carloslive2"
+      ]
+    },
+    {
+      "user_id": "artist_007",
+      "accountType": "artist",
+      "name": "Bob Sled",
+      "email": "bobsledband@gmail.com",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Pop", "Punk"],
+      "artistDescription": "Bob Sled is an all-girl pop-punk band out of Silver Lake with bright melodies, crunchy guitars, and quirky, catchy songs that land fast with live crowds. They balance fun hooks with sharp playing and a playful stage presence.",
+      "city": "Silver Lake, Los Angeles",
+      "summary": "All-girl pop-punk band with catchy melodic songs and high-energy sets",
+      "website": "https://example.com/bobsled",
+      "spotify": "https://open.spotify.com/artist/examplebobsled",
+      "audioFileUpload": "https://example.com/bobsledsample.mp3",
+      "bandPicUrl": "https://example.com/bobsled-band-photo.jpg",
+      "youtube": [
+        "https://www.youtube.com/watch?v=bobsledlive1",
+        "https://www.youtube.com/watch?v=bobsledlive2"
+      ]
+    },
+    {
+      "user_id": "artist_008",
+      "accountType": "artist",
+      "name": "Lily Thompson",
+      "email": "lilythompsonmusic@gmail.com",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Folk", "Pop"],
+      "artistDescription": "Lily Thompson is a New York City folk singer with quirky songs, beautiful melodies, and a warm acoustic live show that lands equally well in listening rooms and intimate clubs. Her new album, One More Time, is bringing fresh attention to a growing fan base that already reaches all the way to Amsterdam.",
+      "city": "New York City",
+      "summary": "NYC folk singer-songwriter with a new album, One More Time, and a strong Amsterdam following",
+      "website": "https://example.com/lilythompson",
+      "spotify": "https://open.spotify.com/artist/examplelilythompson",
+      "audioFileUpload": "https://example.com/lilythompsonsample.mp3",
+      "bandPicUrl": "https://example.com/lily-thompson-photo.jpg",
+      "youtube": [
+        "https://www.youtube.com/watch?v=lilythompsonlive1",
+        "https://www.youtube.com/watch?v=lilythompsonlive2"
+      ]
+    },
+    {
+      "user_id": "artist_009",
+      "accountType": "artist",
+      "name": "Chrome Deluxe",
+      "email": "chromedeluxeband@gmail.com",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Blues", "Rock"],
+      "artistDescription": "Chrome Deluxe is a Burlingame band playing fun blues gigs and oldies-inspired sets with a laid-back bar-band feel. Their show mixes traditional songs, crowd-friendly grooves, and familiar staples like Mustang Sally for rooms that want a classic good-time night.",
+      "city": "Burlingame",
+      "summary": "Burlingame blues and oldies band playing traditional songs and easygoing crowd favorites",
+      "website": "https://example.com/chromedeluxe",
+      "spotify": "https://open.spotify.com/artist/examplechromedeluxe",
+      "audioFileUpload": "https://example.com/chromedeluxesample.mp3",
+      "bandPicUrl": "https://example.com/chrome-deluxe-band-photo.jpg",
+      "youtube": [
+        "https://www.youtube.com/watch?v=chromedeluxelive1",
+        "https://www.youtube.com/watch?v=chromedeluxelive2"
+      ]
+    },
+    {
+      "user_id": "artist_010",
+      "accountType": "artist",
+      "name": "Osees",
+      "email": "oseesband@gmail.com",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Rock", "Alternative/Indie", "Electronic/EDM"],
+      "artistDescription": "Osees is a prolific Los Angeles-based rock band originally formed in San Francisco, known for blending garage rock, psychedelia, krautrock, and folk influences into intense, high-energy live shows with an off-kilter edge.",
+      "city": "Los Angeles",
+      "summary": "Prolific psych-garage rock band with explosive live sets and a long-running cult following",
+      "website": "https://example.com/osees",
+      "spotify": "https://open.spotify.com/artist/exampleosees",
+      "audioFileUpload": "https://example.com/oseessample.mp3",
+      "bandPicUrl": "https://example.com/osees-band-photo.jpg",
+      "youtube": [
+        "https://www.youtube.com/watch?v=oseeslive1",
+        "https://www.youtube.com/watch?v=oseeslive2"
+      ]
+    },
+    {
+      "user_id": "artist_011",
+      "accountType": "artist",
+      "name": "The Not Yetis",
+      "email": "thenotyetisband@gmail.com",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Rock", "Alternative/Indie", "Punk"],
+      "artistDescription": "The Not Yetis is a San Francisco garage-rock band with a lo-fi DIY streak and a weirdly charming budget rock opera concept about mythical creatures adapting to human life. Their songs balance scrappy hooks, noisy energy, and offbeat storytelling.",
+      "city": "San Francisco",
+      "summary": "SF garage-rock band with lo-fi energy, quirky mythic themes, and a 26-song debut LP",
+      "website": "https://example.com/thenotyetis",
+      "spotify": "https://open.spotify.com/artist/examplethenotyetis",
+      "audioFileUpload": "https://example.com/thenotyetissample.mp3",
+      "bandPicUrl": "https://example.com/the-not-yetis-band-photo.jpg",
+      "youtube": [
+        "https://www.youtube.com/watch?v=thenotyetislive1",
+        "https://www.youtube.com/watch?v=thenotyetislive2"
+      ]
+    },
+    {
+      "user_id": "artist_012",
+      "accountType": "artist",
+      "name": "Kingdom First",
+      "email": "kingdomfirstband@gmail.com",
+      "contactEmail": "contact@example.com",
+      "artistType": "Musician/Band",
+      "genre": ["Rock", "Metal", "Punk"],
+      "artistDescription": "Kingdom First is a scorching SF/PDX hard rock band known for high-energy, riff-heavy sets and a sharp edge shaped by punk and noise-rock roots. Reunited after a brief late-'90s and early-2000s run, the band has returned to Bay Area stages with tight layered guitars and a renewed Northwest touring push.",
+      "city": "San Francisco / Portland",
+      "summary": "Reunited hard rock band with heavy riffs, punk pedigree, and explosive Bay Area live sets",
+      "website": "https://example.com/kingdomfirst",
+      "spotify": "https://open.spotify.com/artist/examplekingdomfirst",
+      "audioFileUpload": "https://example.com/kingdomfirstsample.mp3",
+      "bandPicUrl": "https://example.com/kingdom-first-band-photo.jpg",
+      "youtube": [
+        "https://www.youtube.com/watch?v=kingdomfirstlive1",
+        "https://www.youtube.com/watch?v=kingdomfirstlive2"
+      ]
     }
   ],
   "clubs": [
@@ -210,6 +350,181 @@
         {
           "date": "2026-05-03",
           "lookingFor": "Indie singer-songwriter for early evening"
+        }
+      ]
+    },
+    {
+      "user_id": "club_007",
+      "accountType": "club-booker",
+      "name": "Coney Island High",
+      "email": "coneyislandhighbooking@gmail.com",
+      "city": "Manhattan, New York City",
+      "capacity": 150,
+      "summary": "Lower Manhattan room booking rock, punk, and alternative bands with a classic downtown club feel",
+      "availableDates": [
+        {
+          "date": "2026-05-08",
+          "lookingFor": "Punk or alt-rock headliner"
+        },
+        {
+          "date": "2026-05-15",
+          "lookingFor": "Melodic rock support act"
+        },
+        {
+          "date": "2026-05-22",
+          "lookingFor": "Local punk bill with 30-45 minute sets"
+        }
+      ]
+    },
+    {
+      "user_id": "club_008",
+      "accountType": "club-booker",
+      "name": "CBGBs",
+      "email": "cbgbsbooking@gmail.com",
+      "city": "Manhattan, New York City",
+      "capacity": 150,
+      "summary": "Legendary Manhattan punk club known as an early home for Blondie, the Ramones, Talking Heads, and other foundational bands of the scene",
+      "availableDates": [
+        {
+          "date": "2026-05-09",
+          "lookingFor": "Classic punk or new wave inspired band"
+        },
+        {
+          "date": "2026-05-30",
+          "lookingFor": "High-energy local support for a punk showcase"
+        }
+      ]
+    },
+    {
+      "user_id": "club_009",
+      "accountType": "club-booker",
+      "name": "Slim's",
+      "email": "slimssfbooking@gmail.com",
+      "city": "San Francisco",
+      "capacity": 250,
+      "summary": "Large San Francisco room with great sound and a long history of hosting all kinds of bands",
+      "availableDates": [
+        {
+          "date": "2026-05-14",
+          "lookingFor": "Touring indie or rock support act"
+        },
+        {
+          "date": "2026-05-28",
+          "lookingFor": "Strong local headliner with draw"
+        }
+      ]
+    },
+    {
+      "user_id": "club_010",
+      "accountType": "club-booker",
+      "name": "DNA Lounge",
+      "email": "dnaloungebooking@gmail.com",
+      "city": "San Francisco",
+      "capacity": 250,
+      "summary": "Versatile San Francisco venue hosting bands, dance nights, electronic events, and darker goth-leaning club programming",
+      "availableDates": [
+        {
+          "date": "2026-05-07",
+          "lookingFor": "Darkwave, goth, or electronic crossover act"
+        },
+        {
+          "date": "2026-05-21",
+          "lookingFor": "Punk, alt, or danceable late-night band"
+        }
+      ]
+    },
+    {
+      "user_id": "club_011",
+      "accountType": "club-booker",
+      "name": "The Garage",
+      "email": "thegaragebookingla@gmail.com",
+      "city": "Los Angeles",
+      "capacity": 175,
+      "summary": "LA room focused on local punk, rock, surf, and psychedelic acts, plus bands shaped by 1960s garage rock and 1970s California punk and new wave scenes",
+      "availableDates": [
+        {
+          "date": "2026-05-13",
+          "lookingFor": "Garage rock or surf-punk local bill"
+        },
+        {
+          "date": "2026-05-20",
+          "lookingFor": "Psych rock or punk/new wave inspired headliner"
+        }
+      ]
+    },
+    {
+      "user_id": "club_012",
+      "accountType": "club-booker",
+      "name": "The Rip Tide",
+      "email": "theriptidebooking@gmail.com",
+      "city": "San Francisco",
+      "capacity": 95,
+      "summary": "Small neighborhood bar near the beach with a surf-leaning local crowd, hosting low-volume punk, rock, and country bands out of respect for nearby neighbors",
+      "availableDates": [
+        {
+          "date": "2026-05-12",
+          "lookingFor": "Low-volume surf rock, country, or punk trio"
+        },
+        {
+          "date": "2026-05-26",
+          "lookingFor": "Local rock band with compact setup and early finish"
+        }
+      ]
+    },
+    {
+      "user_id": "club_013",
+      "accountType": "club-booker",
+      "name": "Doll Hut",
+      "email": "dollhutbooking@gmail.com",
+      "city": "Anaheim",
+      "capacity": 89,
+      "summary": "Long-running Anaheim punk club known as an Orange County scene mainstay, with an intimate, high-energy room that helped launch local bands before they broke wider",
+      "availableDates": [
+        {
+          "date": "2026-05-11",
+          "lookingFor": "OC punk or hardcore local opener"
+        },
+        {
+          "date": "2026-05-25",
+          "lookingFor": "Intense small-room punk bill"
+        }
+      ]
+    },
+    {
+      "user_id": "club_014",
+      "accountType": "club-booker",
+      "name": "924 Gilman Street",
+      "email": "gilmanbooking@gmail.com",
+      "city": "Berkeley",
+      "capacity": 300,
+      "summary": "Legendary all-ages Berkeley punk space and community hub, widely seen as a launch point for the '90s punk revival and a longtime home for DIY shows, art, and organizing",
+      "availableDates": [
+        {
+          "date": "2026-05-10",
+          "lookingFor": "All-ages punk, ska-punk, or DIY hardcore bill"
+        },
+        {
+          "date": "2026-05-24",
+          "lookingFor": "Community-minded local punk or alternative lineup"
+        }
+      ]
+    },
+    {
+      "user_id": "club_015",
+      "accountType": "club-booker",
+      "name": "Thee Stork Club",
+      "email": "thestorkclubbooking@gmail.com",
+      "city": "Oakland",
+      "capacity": 140,
+      "summary": "Storied Oakland dive bar and live venue in KONO hosting bands, comedy, and burlesque, with a casual neighborhood feel and roots in the local underground scene",
+      "availableDates": [
+        {
+          "date": "2026-05-16",
+          "lookingFor": "Indie, punk, or garage band for late set"
+        },
+        {
+          "date": "2026-05-29",
+          "lookingFor": "Eclectic local bill with music and offbeat energy"
         }
       ]
     }

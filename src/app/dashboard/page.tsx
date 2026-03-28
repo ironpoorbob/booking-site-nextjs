@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { getClubBillingIdentifier, getClubBillingStorageKey } from "../billing";
 import { artistTypeLabel, clubBookerTypeLabel, genreOptions } from "./options";
 import ArtistInquiryList from "./ArtistInquiryList";
 import BookingInquiryList from "./BookingInquiryList";
@@ -71,6 +72,7 @@ function DashboardPageContent() {
   const searchHref = `/dashboard/search?${toSearchString(profile)}`;
   const profileQuery = toSearchString(profile);
   const dashboardReturnTo = `/dashboard?${profileQuery}`;
+  const [, setBillingStatusRefreshKey] = useState(0);
 
   const roleName = profile.accountType === "artist" ? "Band Name" : "Venue / Booker Name";
   const roleValue = profile.accountType === "artist" ? profile.bandName : profile.venueName;
@@ -105,6 +107,65 @@ function DashboardPageContent() {
       Boolean(entry.artist),
     );
 
+  const hasClubSubscription = (() => {
+    if (profile.accountType !== "club-booker") {
+      return true;
+    }
+
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    try {
+      const stored = window.localStorage.getItem(
+        getClubBillingStorageKey(getClubBillingIdentifier(profile)),
+      );
+
+      if (!stored) {
+        return false;
+      }
+
+      const parsed = JSON.parse(stored) as { active?: boolean };
+      return parsed.active === true;
+    } catch {
+      return false;
+    }
+  })();
+
+  if (profile.accountType === "club-booker" && !hasClubSubscription) {
+    const billingHref = `/billing?${profileQuery}`;
+
+    return (
+      <main className="min-h-screen py-10">
+        <div className="mx-auto grid w-full max-w-4xl gap-6">
+          <section className="rounded-2xl border border-white/15 bg-black/70 p-6 md:p-8">
+            <p className="text-xs tracking-[0.2em] text-zinc-400 uppercase">Billing Required</p>
+            <h1 className="mt-2 font-display text-4xl tracking-wider text-white md:text-5xl">
+              Activate Your Club Subscription
+            </h1>
+            <p className="mt-3 max-w-2xl text-zinc-300">
+              Clubs and bookers need an active subscription to unlock artist search, booking requests, and contact
+              details. Artists remain free.
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link className="btn-primary" href={billingHref}>
+                Go to Billing
+              </Link>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setBillingStatusRefreshKey((value) => value + 1)}
+              >
+                Refresh Status
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen py-10">
       <div className="mx-auto grid w-full max-w-4xl gap-6">
@@ -118,6 +179,11 @@ function DashboardPageContent() {
               <p className="mt-2 text-zinc-300">{profile.username}</p>
             </div>
             <div className="flex flex-wrap gap-2">
+              {profile.accountType === "club-booker" ? (
+                <Link className="btn-secondary" href={`/billing?${profileQuery}`}>
+                  Billing
+                </Link>
+              ) : null}
               <Link className="btn-secondary" href={searchHref}>
                 {profile.accountType === "artist" ? "Search Clubs" : "Search Artists"}
               </Link>

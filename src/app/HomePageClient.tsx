@@ -758,15 +758,15 @@ export default function HomePageClient() {
 
         {isMatchesOpen ? (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true">
-            <div className="w-full max-w-4xl rounded-3xl border border-white/20 bg-zinc-950 p-6 md:p-8">
+            <div className="w-full max-w-2xl rounded-3xl border border-white/20 bg-zinc-950 p-6 md:p-8">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs tracking-[0.15em] text-zinc-400 uppercase">Instant Matches</p>
                   <h2 className="mt-2 font-display text-4xl tracking-wider text-white">
-                    Here are {artistMatches.length} artists that match your venue profile
+                    You have {artistMatches.length} artist matches
                   </h2>
                   <p className="mt-3 text-zinc-300">
-                    Contact details stay locked until you create an account.
+                    Sign up to see who they are, unlock contact details, and start reaching out.
                   </p>
                 </div>
                 <button
@@ -779,25 +779,12 @@ export default function HomePageClient() {
                 </button>
               </div>
 
-              <div className="mt-8 grid gap-4 md:grid-cols-2">
-                {artistMatches.length > 0 ? (
-                  artistMatches.map((artist) => (
-                    <article key={artist.userId} className="rounded-2xl border border-white/10 bg-black/40 p-5">
-                      <p className="font-semibold text-white">{artist.name}</p>
-                      <p className="mt-1 text-zinc-300">{artist.city}</p>
-                      <p className="mt-3 text-zinc-200">{artist.summary}</p>
-                      <p className="mt-3 text-sm text-zinc-400">{artist.meta}</p>
-                      <div className="mt-4 rounded-xl border border-dashed border-white/15 bg-white/5 px-4 py-3">
-                        <p className="text-xs tracking-[0.12em] text-zinc-500 uppercase">Contact Locked</p>
-                        <p className="mt-1 select-none text-zinc-500 blur-[2px]">artistname@gmail.com</p>
-                      </div>
-                    </article>
-                  ))
-                ) : (
-                  <div className="rounded-2xl border border-white/10 bg-black/40 p-5 text-zinc-300 md:col-span-2">
-                    No exact matches yet. Your venue profile is still saved, and you can continue to sign up to refine your search.
-                  </div>
-                )}
+              <div className="mt-8 rounded-2xl border border-white/10 bg-black/40 p-6 text-center">
+                <p className="font-display text-6xl tracking-wider text-white">{artistMatches.length}</p>
+                <p className="mt-2 text-zinc-300">Artists matched to your venue setup</p>
+                <p className="mt-4 text-sm text-zinc-400">
+                  Create an account to reveal names, emails, genres, and booking actions.
+                </p>
               </div>
 
               <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
@@ -822,15 +809,15 @@ export default function HomePageClient() {
 
         {isArtistMatchesOpen ? (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true">
-            <div className="w-full max-w-4xl rounded-3xl border border-white/20 bg-zinc-950 p-6 md:p-8">
+            <div className="w-full max-w-2xl rounded-3xl border border-white/20 bg-zinc-950 p-6 md:p-8">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs tracking-[0.15em] text-zinc-400 uppercase">Instant Matches</p>
                   <h2 className="mt-2 font-display text-4xl tracking-wider text-white">
-                    Here are {clubMatches.length} clubs that match your artist profile
+                    You have {clubMatches.length} club matches
                   </h2>
                   <p className="mt-3 text-zinc-300">
-                    Contact details and booking actions stay locked until you create an account.
+                    Sign up to see venues, unlock booking contacts, and start sending requests.
                   </p>
                 </div>
                 <button
@@ -843,25 +830,12 @@ export default function HomePageClient() {
                 </button>
               </div>
 
-              <div className="mt-8 grid gap-4 md:grid-cols-2">
-                {clubMatches.length > 0 ? (
-                  clubMatches.map((club) => (
-                    <article key={club.userId} className="rounded-2xl border border-white/10 bg-black/40 p-5">
-                      <p className="font-semibold text-white">{club.name}</p>
-                      <p className="mt-1 text-zinc-300">{club.city}</p>
-                      <p className="mt-3 text-zinc-200">{club.summary}</p>
-                      <p className="mt-3 text-sm text-zinc-400">{club.meta}</p>
-                      <div className="mt-4 rounded-xl border border-dashed border-white/15 bg-white/5 px-4 py-3">
-                        <p className="text-xs tracking-[0.12em] text-zinc-500 uppercase">Booking Contact Locked</p>
-                        <p className="mt-1 select-none text-zinc-500 blur-[2px]">bookings@gmail.com</p>
-                      </div>
-                    </article>
-                  ))
-                ) : (
-                  <div className="rounded-2xl border border-white/10 bg-black/40 p-5 text-zinc-300 md:col-span-2">
-                    No exact matches yet. Your artist profile is saved, and you can continue to sign up to refine your search.
-                  </div>
-                )}
+              <div className="mt-8 rounded-2xl border border-white/10 bg-black/40 p-6 text-center">
+                <p className="font-display text-6xl tracking-wider text-white">{clubMatches.length}</p>
+                <p className="mt-2 text-zinc-300">Clubs matched to your artist setup</p>
+                <p className="mt-4 text-sm text-zinc-400">
+                  Create an account to reveal venue names, booking contacts, and available dates.
+                </p>
               </div>
 
               <div className="mt-8 flex flex-wrap items-center justify-between gap-3">

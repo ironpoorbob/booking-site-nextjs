@@ -1,12 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { withBasePath } from "@/lib/base-path";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent } from "react";
 
 export default function SignupPageClient() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const accountType = searchParams.get("accountType") === "club-booker" ? "club-booker" : "artist";
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const params = new URLSearchParams();
+
+    formData.forEach((value, key) => {
+      if (typeof value === "string") {
+        params.append(key, value);
+      }
+    });
+
+    const destination =
+      accountType === "club-booker" ? `/billing?${params.toString()}` : `/dashboard?${params.toString()}`;
+
+    router.push(destination);
+  }
 
   return (
     <main className="noise-bg min-h-screen px-6 py-16">
@@ -14,7 +33,7 @@ export default function SignupPageClient() {
         <h1 className="font-display text-5xl tracking-wider text-white md:text-6xl">Create Account</h1>
         <p className="mt-3 text-zinc-300">Join as an artist or a club/booker.</p>
 
-        <form className="mt-8 space-y-5" action={withBasePath("/dashboard")} method="get">
+        <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
           <fieldset>
             <legend className="mb-2 text-sm tracking-[0.12em] text-zinc-200 uppercase">I am a...</legend>
             <div className="role-group">
@@ -53,7 +72,6 @@ export default function SignupPageClient() {
             <span>Real Name</span>
             <input className="form-input" name="realName" type="text" />
           </label>
-
           <button className="btn-primary mt-5 w-full justify-center" type="submit">
             Create Account
           </button>
