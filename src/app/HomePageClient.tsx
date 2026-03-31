@@ -95,10 +95,6 @@ const emptyArtistDraft: ArtistOnboardingDraft = {
 };
 
 function readStoredClubDraft(): ClubOnboardingDraft {
-  if (typeof window === "undefined") {
-    return emptyClubDraft;
-  }
-
   try {
     const stored = window.localStorage.getItem(CLUB_ONBOARDING_STORAGE_KEY);
 
@@ -123,10 +119,6 @@ function readStoredClubDraft(): ClubOnboardingDraft {
 }
 
 function readStoredArtistDraft(): ArtistOnboardingDraft {
-  if (typeof window === "undefined") {
-    return emptyArtistDraft;
-  }
-
   try {
     const stored = window.localStorage.getItem(ARTIST_ONBOARDING_STORAGE_KEY);
 
@@ -167,8 +159,8 @@ export default function HomePageClient() {
   const [isMatchesOpen, setIsMatchesOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [artistStep, setArtistStep] = useState(0);
-  const [clubDraft, setClubDraft] = useState<ClubOnboardingDraft>(readStoredClubDraft);
-  const [artistDraft, setArtistDraft] = useState<ArtistOnboardingDraft>(readStoredArtistDraft);
+  const [clubDraft, setClubDraft] = useState<ClubOnboardingDraft>(emptyClubDraft);
+  const [artistDraft, setArtistDraft] = useState<ArtistOnboardingDraft>(emptyArtistDraft);
 
   function persistDraft(nextDraft: ClubOnboardingDraft) {
     setClubDraft(nextDraft);
@@ -226,6 +218,18 @@ export default function HomePageClient() {
     window.localStorage.setItem(ARTIST_ONBOARDING_STORAGE_KEY, JSON.stringify(artistDraft));
     setIsArtistWizardOpen(false);
     setIsArtistMatchesOpen(true);
+  }
+
+  function openClubWizard() {
+    setClubDraft(readStoredClubDraft());
+    setCurrentStep(0);
+    setIsClubWizardOpen(true);
+  }
+
+  function openArtistWizard() {
+    setArtistDraft(readStoredArtistDraft());
+    setArtistStep(0);
+    setIsArtistWizardOpen(true);
   }
 
   const totalSteps = 5;
@@ -332,20 +336,14 @@ export default function HomePageClient() {
                 <button
                   type="button"
                   className="btn-primary"
-                  onClick={() => {
-                    setArtistStep(0);
-                    setIsArtistWizardOpen(true);
-                  }}
+                  onClick={openArtistWizard}
                 >
                   Look for Clubs
                 </button>
                 <button
                   type="button"
                   className="btn-secondary"
-                  onClick={() => {
-                    setCurrentStep(0);
-                    setIsClubWizardOpen(true);
-                  }}
+                  onClick={openClubWizard}
                 >
                   Look for Artists
                 </button>

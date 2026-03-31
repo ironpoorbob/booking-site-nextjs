@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Suspense, useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { withBasePath } from "@/lib/base-path";
-import { getProfileFallbackFromMock, getSearchResultsFromMock } from "../mock-data";
+import { getCoordinatesForLocation, getProfileFallbackFromMock, getSearchResultsFromMock } from "../mock-data";
 import { artistTypeOptions, genreOptions } from "../options";
 import {
   getAccountTypeFromSearchParams,
@@ -118,6 +118,28 @@ function formatNeedDate(dateString: string): { label: string; iso: string } {
   return { label, iso: dateString };
 }
 
+function getDistanceMiles(
+  from: { lat: number; lng: number },
+  to: { lat: number; lng: number },
+): number {
+  const earthRadiusMiles = 3958.8;
+  const latDelta = ((to.lat - from.lat) * Math.PI) / 180;
+  const lngDelta = ((to.lng - from.lng) * Math.PI) / 180;
+  const fromLatRadians = (from.lat * Math.PI) / 180;
+  const toLatRadians = (to.lat * Math.PI) / 180;
+
+  const haversine =
+    Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+    Math.cos(fromLatRadians) *
+      Math.cos(toLatRadians) *
+      Math.sin(lngDelta / 2) *
+      Math.sin(lngDelta / 2);
+
+  const arc = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+
+  return earthRadiusMiles * arc;
+}
+
 function SearchPageContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -147,6 +169,7 @@ function SearchPageContent() {
   const showTime = readFirst(raw.showTime);
   const use24HourClock = readFirst(raw.showClock24) === "1";
   const hasSubmittedSearch = readFirst(raw.submitted) === "1";
+  const distanceRadius = readFirst(raw.distanceRadius) || "25";
   const selectedGenres = new Set(readList(raw.genres));
   const artistSearchType = readFirst(raw.artistSearchType) || profile.artistType;
   const musicTypeFilters = new Set(readList(raw.musicTypes));
@@ -154,6 +177,12 @@ function SearchPageContent() {
   const dateTo = readFirst(raw.dateTo);
   const allResults = getSearchResultsFromMock(profile.accountType);
   const isArtistSearch = profile.accountType === "club-booker";
+  const searchOrigin = !isArtistSearch
+    ? getCoordinatesForLocation(query) ||
+      getCoordinatesForLocation(profile.artistHomeCity) ||
+      getCoordinatesForLocation(profile.location)
+    : null;
+  const distanceLimitMiles = distanceRadius === "any" ? null : Number(distanceRadius);
 
   const filteredResults = allResults
     .map((result) => {
@@ -198,8 +227,25 @@ function SearchPageContent() {
     }
 
     if (!isArtistSearch) {
+      if (
+        distanceLimitMiles !== null &&
+        searchOrigin &&
+        typeof result.lat === "number" &&
+        typeof result.lng === "number"
+      ) {
+        const distance = getDistanceMiles(searchOrigin, { lat: result.lat, lng: result.lng });
+
+        if (distance > distanceLimitMiles) {
+          return false;
+        }
+      }
+
       const hasActiveClubFilters =
-        musicTypeFilters.size > 0 || Boolean(dateFrom) || Boolean(dateTo) || artistSearchType !== "musician-band";
+        musicTypeFilters.size > 0 ||
+        Boolean(dateFrom) ||
+        Boolean(dateTo) ||
+        artistSearchType !== "musician-band" ||
+        distanceRadius !== "any";
 
       if (!hasActiveClubFilters) {
         return true;
@@ -209,7 +255,26 @@ function SearchPageContent() {
     }
 
     return matchesSelectedGenre(result.genres, selectedGenres);
-  });
+  })
+    .sort((left, right) => {
+      if (isArtistSearch || !searchOrigin) {
+        return 0;
+      }
+
+      if (
+        typeof left.lat !== "number" ||
+        typeof left.lng !== "number" ||
+        typeof right.lat !== "number" ||
+        typeof right.lng !== "number"
+      ) {
+        return 0;
+      }
+
+      const leftDistance = getDistanceMiles(searchOrigin, { lat: left.lat, lng: left.lng });
+      const rightDistance = getDistanceMiles(searchOrigin, { lat: right.lat, lng: right.lng });
+
+      return leftDistance - rightDistance;
+    });
 
   const pageTitle = profile.accountType === "artist" ? "Club-Centric Search" : "Artist-Centric Search";
   const pageSubtitle =
@@ -318,6 +383,15 @@ function SearchPageContent() {
 
             {!isArtistSearch ? (
               <>
+                <label className="form-group w-full sm:w-auto">
+                  <span>Distance</span>
+                  <select className="form-input" name="distanceRadius" defaultValue={distanceRadius}>
+                    <option value="10">Within 10 miles</option>
+                    <option value="25">Within 25 miles</option>
+                    <option value="50">Within 50 miles</option>
+                    <option value="any">Anywhere</option>
+                  </select>
+                </label>
                 <label className="form-group w-full sm:w-auto">
                   <span>Artist Type</span>
                   <select className="form-input" name="artistSearchType" defaultValue={artistSearchType}>

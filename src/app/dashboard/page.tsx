@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useMemo, useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import { getClubBillingIdentifier, getClubBillingStorageKey } from "../billing";
 import { artistTypeLabel, clubBookerTypeLabel, genreOptions } from "./options";
@@ -73,6 +73,11 @@ function DashboardPageContent() {
   const profileQuery = toSearchString(profile);
   const dashboardReturnTo = `/dashboard?${profileQuery}`;
   const [, setBillingStatusRefreshKey] = useState(0);
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const roleName = profile.accountType === "artist" ? "Band Name" : "Venue / Booker Name";
   const roleValue = profile.accountType === "artist" ? profile.bandName : profile.venueName;
@@ -107,30 +112,29 @@ function DashboardPageContent() {
       Boolean(entry.artist),
     );
 
-  const hasClubSubscription = (() => {
-    if (profile.accountType !== "club-booker") {
-      return true;
-    }
+  if (profile.accountType === "club-booker" && !isClient) {
+    return <main className="min-h-screen py-10" />;
+  }
 
-    if (typeof window === "undefined") {
-      return false;
-    }
+  const hasClubSubscription =
+    profile.accountType !== "club-booker"
+      ? true
+      : (() => {
+          try {
+            const stored = window.localStorage.getItem(
+              getClubBillingStorageKey(getClubBillingIdentifier(profile)),
+            );
 
-    try {
-      const stored = window.localStorage.getItem(
-        getClubBillingStorageKey(getClubBillingIdentifier(profile)),
-      );
+            if (!stored) {
+              return false;
+            }
 
-      if (!stored) {
-        return false;
-      }
-
-      const parsed = JSON.parse(stored) as { active?: boolean };
-      return parsed.active === true;
-    } catch {
-      return false;
-    }
-  })();
+            const parsed = JSON.parse(stored) as { active?: boolean };
+            return parsed.active === true;
+          } catch {
+            return false;
+          }
+        })();
 
   if (profile.accountType === "club-booker" && !hasClubSubscription) {
     const billingHref = `/billing?${profileQuery}`;

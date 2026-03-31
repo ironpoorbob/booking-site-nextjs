@@ -7,6 +7,8 @@ type MockArtist = {
   name: string;
   email?: string;
   city: string;
+  lat?: number;
+  lng?: number;
   genre?: string | string[];
   summary?: string;
   bandPicUrl?: string;
@@ -20,6 +22,8 @@ type MockClub = {
   name: string;
   email?: string;
   city: string;
+  lat?: number;
+  lng?: number;
   capacity?: number;
   summary?: string;
   availableDates?: Array<{
@@ -92,6 +96,8 @@ export type SearchResult = {
   userId: string;
   name: string;
   city: string;
+  lat?: number;
+  lng?: number;
   summary: string;
   meta: string;
   email?: string;
@@ -109,6 +115,8 @@ export type ArtistProfilePreview = {
   userId: string;
   name: string;
   city: string;
+  lat?: number;
+  lng?: number;
   summary: string;
   artistDescription: string;
   genres: string[];
@@ -120,6 +128,8 @@ export type ClubProfilePreview = {
   userId: string;
   name: string;
   city: string;
+  lat?: number;
+  lng?: number;
   summary: string;
   capacity: string;
   availableDates: Array<{
@@ -197,6 +207,8 @@ export function getSearchResultsFromMock(accountType: AccountType): SearchResult
         userId: club.user_id ?? "",
         name: club.name,
         city: club.city,
+        lat: club.lat,
+        lng: club.lng,
         summary: club.summary ?? "No summary provided",
         meta: club.capacity ? `Capacity: ${club.capacity}` : "Capacity not listed",
         email: club.email,
@@ -208,6 +220,8 @@ export function getSearchResultsFromMock(accountType: AccountType): SearchResult
       userId: artist.user_id ?? "",
       name: artist.name,
       city: artist.city,
+      lat: artist.lat,
+      lng: artist.lng,
       summary: artist.summary ?? "No summary provided",
       meta: artist.genre
         ? `Genre: ${Array.isArray(artist.genre) ? artist.genre.join(", ") : artist.genre}`
@@ -236,6 +250,8 @@ export function getArtistByUserIdFromMock(userId: string): ArtistProfilePreview 
       userId: artist.user_id ?? "",
       name: artist.name,
       city: artist.city,
+      lat: artist.lat,
+      lng: artist.lng,
       summary: artist.summary ?? "No summary provided",
       artistDescription: artist.artistDescription ?? "No description provided.",
       genres: normalizeMockGenres(artist.genre),
@@ -265,6 +281,8 @@ export function getClubByUserIdFromMock(userId: string): ClubProfilePreview | nu
       userId: club.user_id ?? "",
       name: club.name,
       city: club.city,
+      lat: club.lat,
+      lng: club.lng,
       summary: club.summary ?? "No summary provided",
       capacity: club.capacity ? String(club.capacity) : "Not listed",
       availableDates: club.availableDates ?? [],
@@ -277,4 +295,40 @@ export function getClubByUserIdFromMock(userId: string): ClubProfilePreview | nu
 export function getClubUserIdsFromMock(): string[] {
   const data = loadMockData();
   return (data.clubs ?? []).map((club) => club.user_id ?? "").filter(Boolean);
+}
+
+export function getCoordinatesForLocation(location: string): { lat: number; lng: number } | null {
+  const normalizedLocation = location.trim().toLowerCase();
+
+  if (!normalizedLocation) {
+    return null;
+  }
+
+  const data = loadMockData();
+  const locations = [...(data.artists ?? []), ...(data.clubs ?? [])];
+
+  const exactMatch = locations.find(
+    (entry) =>
+      typeof entry.lat === "number" &&
+      typeof entry.lng === "number" &&
+      entry.city.trim().toLowerCase() === normalizedLocation,
+  );
+
+  if (exactMatch && typeof exactMatch.lat === "number" && typeof exactMatch.lng === "number") {
+    return { lat: exactMatch.lat, lng: exactMatch.lng };
+  }
+
+  const fuzzyMatch = locations.find(
+    (entry) =>
+      typeof entry.lat === "number" &&
+      typeof entry.lng === "number" &&
+      (entry.city.trim().toLowerCase().includes(normalizedLocation) ||
+        normalizedLocation.includes(entry.city.trim().toLowerCase())),
+  );
+
+  if (fuzzyMatch && typeof fuzzyMatch.lat === "number" && typeof fuzzyMatch.lng === "number") {
+    return { lat: fuzzyMatch.lat, lng: fuzzyMatch.lng };
+  }
+
+  return null;
 }
