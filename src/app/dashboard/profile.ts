@@ -19,6 +19,7 @@ export type DashboardProfile = {
   clubBookerType: string;
   venueCapacity: string;
   bookingContactEmail: string;
+  clubPicUrl: string;
   typicalBookingNights: string;
   clubGenres: string[];
   artistNotes: string;
@@ -109,6 +110,7 @@ export function parseProfileFromSearchParams(
     venueCapacity: firstValue(searchParams.venueCapacity) || fallback.venueCapacity || "Not set",
     bookingContactEmail:
       firstValue(searchParams.bookingContactEmail) || fallback.bookingContactEmail || "Not set",
+    clubPicUrl: firstValue(searchParams.clubPicUrl) || fallback.clubPicUrl || "",
     typicalBookingNights:
       firstValue(searchParams.typicalBookingNights) || fallback.typicalBookingNights || "Not set",
     clubGenres: clubGenresFromParams.length > 0 ? clubGenresFromParams : fallback.clubGenres || [],
@@ -136,6 +138,7 @@ export function toSearchString(profile: DashboardProfile): string {
   params.set("clubBookerType", profile.clubBookerType);
   params.set("venueCapacity", profile.venueCapacity);
   params.set("bookingContactEmail", profile.bookingContactEmail);
+  params.set("clubPicUrl", profile.clubPicUrl);
   params.set("typicalBookingNights", profile.typicalBookingNights);
   profile.clubGenres.forEach((genre) => params.append("clubGenres", genre));
   params.set("artistNotes", profile.artistNotes);

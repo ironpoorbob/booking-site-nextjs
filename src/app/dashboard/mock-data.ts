@@ -11,6 +11,8 @@ type MockArtist = {
   lng?: number;
   genre?: string | string[];
   summary?: string;
+  website?: string;
+  spotify?: string;
   bandPicUrl?: string;
   artistDescription?: string;
   youtube?: string[];
@@ -26,6 +28,7 @@ type MockClub = {
   lng?: number;
   capacity?: number;
   summary?: string;
+  clubPicUrl?: string;
   availableDates?: Array<{
     date: string;
     lookingFor: string;
@@ -118,6 +121,8 @@ export type ArtistProfilePreview = {
   lat?: number;
   lng?: number;
   summary: string;
+  website: string;
+  spotify: string;
   artistDescription: string;
   genres: string[];
   bandPicUrl: string;
@@ -130,8 +135,10 @@ export type ClubProfilePreview = {
   city: string;
   lat?: number;
   lng?: number;
+  email: string;
   summary: string;
   capacity: string;
+  clubPicUrl: string;
   availableDates: Array<{
     date: string;
     lookingFor: string;
@@ -174,7 +181,8 @@ export function getProfileFallbackFromMock(accountType: AccountType): ProfileFal
       };
     }
 
-    const firstClub = data.clubs?.[0];
+    const firstClub =
+      data.clubs?.find((club) => club.name.toLowerCase() === "bottom of the hill") ?? data.clubs?.[0];
 
     if (!firstClub) {
       return {};
@@ -189,6 +197,7 @@ export function getProfileFallbackFromMock(accountType: AccountType): ProfileFal
       clubBookerType: "venue-club",
       venueCapacity: firstClub.capacity ? String(firstClub.capacity) : "Not set",
       bookingContactEmail: firstClub.email ?? "bookings@gmail.com",
+      clubPicUrl: firstClub.clubPicUrl ?? "",
       typicalBookingNights: "Thursday, Friday, Saturday",
       clubGenres: [],
       artistNotes: firstClub.summary ?? "Share stage expectations and production details.",
@@ -253,6 +262,8 @@ export function getArtistByUserIdFromMock(userId: string): ArtistProfilePreview 
       lat: artist.lat,
       lng: artist.lng,
       summary: artist.summary ?? "No summary provided",
+      website: artist.website ?? "",
+      spotify: artist.spotify ?? "",
       artistDescription: artist.artistDescription ?? "No description provided.",
       genres: normalizeMockGenres(artist.genre),
       bandPicUrl: artist.bandPicUrl ?? "",
@@ -283,8 +294,10 @@ export function getClubByUserIdFromMock(userId: string): ClubProfilePreview | nu
       city: club.city,
       lat: club.lat,
       lng: club.lng,
+      email: club.email ?? "",
       summary: club.summary ?? "No summary provided",
       capacity: club.capacity ? String(club.capacity) : "Not listed",
+      clubPicUrl: club.clubPicUrl ?? "",
       availableDates: club.availableDates ?? [],
     };
   } catch {
