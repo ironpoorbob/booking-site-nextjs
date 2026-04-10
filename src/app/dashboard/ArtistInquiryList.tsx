@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import ArtistProfileModal from "./ArtistProfileModal";
 import type { SearchResult } from "./mock-data";
 
 type ArtistInquiry = {
@@ -17,6 +18,7 @@ type ArtistInquiryListProps = {
 
 export default function ArtistInquiryList({ inquiries, profileQuery, returnTo }: ArtistInquiryListProps) {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
   const selectedInquiry = useMemo(
     () => inquiries.find((entry) => entry.artist.userId === selectedUserId) ?? null,
@@ -71,9 +73,10 @@ export default function ArtistInquiryList({ inquiries, profileQuery, returnTo }:
               <button
                 type="button"
                 onClick={() => setSelectedUserId(null)}
-                className="rounded-md border border-white/25 px-3 py-1 text-sm text-zinc-200 hover:bg-white/10"
+                className="rounded-md px-2 py-1 font-display text-3xl leading-none font-bold text-zinc-200 transition-colors hover:bg-white/10 hover:text-white"
+                aria-label="Close artist inquiry"
               >
-                Close
+                X
               </button>
             </div>
 
@@ -87,12 +90,23 @@ export default function ArtistInquiryList({ inquiries, profileQuery, returnTo }:
               <Link className="btn-primary" href={bookingHref}>
                 Book This Artist
               </Link>
-              <Link className="btn-secondary ml-auto" href={`/dashboard/artist/${selectedInquiry.artist.userId}`}>
+              <button
+                type="button"
+                className="btn-secondary ml-auto"
+                onClick={() => setProfileUserId(selectedInquiry.artist.userId)}
+              >
                 View Profile
-              </Link>
+              </button>
             </div>
           </div>
         </div>
+      ) : null}
+
+      {profileUserId ? (
+        <ArtistProfileModal
+          artistUserId={profileUserId}
+          onClose={() => setProfileUserId(null)}
+        />
       ) : null}
     </>
   );

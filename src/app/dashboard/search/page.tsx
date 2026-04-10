@@ -341,6 +341,7 @@ function SearchPageContent() {
             <input type="hidden" name="clubBookerType" value={profile.clubBookerType} />
             <input type="hidden" name="venueCapacity" value={profile.venueCapacity} />
             <input type="hidden" name="bookingContactEmail" value={profile.bookingContactEmail} />
+            <input type="hidden" name="clubPicUrl" value={profile.clubPicUrl} />
             <input type="hidden" name="typicalBookingNights" value={profile.typicalBookingNights} />
             <input type="hidden" name="artistNotes" value={profile.artistNotes} />
             {profile.artistGenres.map((genre) => (

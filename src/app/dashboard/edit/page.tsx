@@ -263,6 +263,17 @@ function EditProfilePageContent() {
               </label>
 
               <label className="form-group">
+                <span>Venue Image URL</span>
+                <input
+                  className="form-input"
+                  name="clubPicUrl"
+                  type="url"
+                  defaultValue={profile.clubPicUrl}
+                  placeholder="https://www.bottomofthehill.com/images/Bred1.jpg"
+                />
+              </label>
+
+              <label className="form-group">
                 <span>Typical Booking Nights</span>
                 <input
                   className="form-input"
@@ -309,6 +320,7 @@ function EditProfilePageContent() {
               <input type="hidden" name="clubBookerType" value={profile.clubBookerType} />
               <input type="hidden" name="venueCapacity" value={profile.venueCapacity} />
               <input type="hidden" name="bookingContactEmail" value={profile.bookingContactEmail} />
+              <input type="hidden" name="clubPicUrl" value={profile.clubPicUrl} />
               <input type="hidden" name="typicalBookingNights" value={profile.typicalBookingNights} />
               {profile.clubGenres.map((genre) => (
                 <input key={genre} type="hidden" name="clubGenres" value={genre} />
@@ -323,6 +335,7 @@ function EditProfilePageContent() {
               <input type="hidden" name="artistSetLength" value={profile.artistSetLength} />
               <input type="hidden" name="artistDescription" value={profile.artistDescription} />
               <input type="hidden" name="bandPicUrl" value={profile.bandPicUrl} />
+              <input type="hidden" name="clubPicUrl" value={profile.clubPicUrl} />
               {profile.artistGenres.map((genre) => (
                 <input key={genre} type="hidden" name="artistGenres" value={genre} />
               ))}

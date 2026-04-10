@@ -13,10 +13,10 @@
       "lat": 37.7749,
       "lng": -122.4194,
       "summary": "New album out, looking for local shows",
-      "website": "https://example.com/decal",
-      "spotify": "",
+      "website": "https://www.bobconlon.com/Decal/",
+      "spotify": "https://open.spotify.com/artist/exampledecal",
       "audioFileUpload": "https://example.com/decalsample.mp3",
-      "bandPicUrl": "https://example.com/decal-band-photo.jpg",
+      "bandPicUrl": "https://www.bobconlon.com/Decal/tracks/Decal/decal-profile.jpg",
       "youtube": [
         "https://www.youtube.com/watch?v=example1",
         "https://www.youtube.com/watch?v=example2"
@@ -97,7 +97,7 @@
       "website": "https://example.com/clarknova",
       "spotify": "",
       "audioFileUpload": "https://example.com/clarknovasample.mp3",
-      "bandPicUrl": "https://example.com/clark-nova-band-photo.jpg",
+      "bandPicUrl": "https://i.discogs.com/aRTNQTZlcivaHmlAmfnWlcUcdmsaMNv78I6_3ScOiZA/rs:fit/g:sm/q:90/h:600/w:490/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTEyMTIy/NjAtMTY4NzE1NTM1/NS02NjQ2LmpwZWc.jpeg",
       "youtube": [
         "https://www.youtube.com/watch?v=example1",
         "https://www.youtube.com/watch?v=example2"
@@ -119,7 +119,7 @@
       "website": "https://example.com/carlos",
       "spotify": "https://open.spotify.com/artist/examplecarlos",
       "audioFileUpload": "https://example.com/carlossample.mp3",
-      "bandPicUrl": "https://example.com/carlos-band-photo.jpg",
+      "bandPicUrl": "http://he3.magnatune.com/music/Slouching%20Stars/Sad%20Moon%20Eyes/artist.jpg",
       "youtube": [
         "https://www.youtube.com/watch?v=carloslive1",
         "https://www.youtube.com/watch?v=carloslive2"
@@ -229,7 +229,7 @@
       "website": "https://example.com/thenotyetis",
       "spotify": "https://open.spotify.com/artist/examplethenotyetis",
       "audioFileUpload": "https://example.com/thenotyetissample.mp3",
-      "bandPicUrl": "https://example.com/the-not-yetis-band-photo.jpg",
+      "bandPicUrl": "https://f4.bcbits.com/img/0016004617_10.jpg",
       "youtube": [
         "https://www.youtube.com/watch?v=thenotyetislive1",
         "https://www.youtube.com/watch?v=thenotyetislive2"
@@ -251,7 +251,7 @@
       "website": "https://example.com/kingdomfirst",
       "spotify": "https://open.spotify.com/artist/examplekingdomfirst",
       "audioFileUpload": "https://example.com/kingdomfirstsample.mp3",
-      "bandPicUrl": "https://example.com/kingdom-first-band-photo.jpg",
+      "bandPicUrl": "https://f4.bcbits.com/img/a3991805867_10.jpg",
       "youtube": [
         "https://www.youtube.com/watch?v=kingdomfirstlive1",
         "https://www.youtube.com/watch?v=kingdomfirstlive2"
@@ -332,6 +332,7 @@
       "lng": -122.4194,
       "capacity": 250,
       "summary": "Independent live music venue in Potrero Hill",
+      "clubPicUrl": "https://www.bottomofthehill.com/images/Bred1.jpg",
       "availableDates": [
         {
           "date": "2026-04-09",

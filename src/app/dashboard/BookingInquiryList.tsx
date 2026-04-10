@@ -55,9 +55,10 @@ export default function BookingInquiryList({ inquiries, profileQuery }: BookingI
               <button
                 type="button"
                 onClick={() => setSelectedUserId(null)}
-                className="rounded-md border border-white/25 px-3 py-1 text-sm text-zinc-200 hover:bg-white/10"
+                className="rounded-md px-2 py-1 font-display text-3xl leading-none font-bold text-zinc-200 transition-colors hover:bg-white/10 hover:text-white"
+                aria-label="Close booking inquiry"
               >
-                Close
+                X
               </button>
             </div>
 
