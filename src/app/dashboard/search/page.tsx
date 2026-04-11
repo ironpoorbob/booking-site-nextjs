@@ -385,15 +385,6 @@ function SearchPageContent() {
             {!isArtistSearch ? (
               <>
                 <label className="form-group w-full sm:w-auto">
-                  <span>Distance</span>
-                  <select className="form-input" name="distanceRadius" defaultValue={distanceRadius}>
-                    <option value="10">Within 10 miles</option>
-                    <option value="25">Within 25 miles</option>
-                    <option value="50">Within 50 miles</option>
-                    <option value="any">Anywhere</option>
-                  </select>
-                </label>
-                <label className="form-group w-full sm:w-auto">
                   <span>Artist Type</span>
                   <select className="form-input" name="artistSearchType" defaultValue={artistSearchType}>
                     {artistTypeOptions.map((option) => (
@@ -401,6 +392,15 @@ function SearchPageContent() {
                         {option.label}
                       </option>
                     ))}
+                  </select>
+                </label>
+                <label className="form-group w-full sm:w-auto">
+                  <span>Distance</span>
+                  <select className="form-input" name="distanceRadius" defaultValue={distanceRadius}>
+                    <option value="10">Within 10 miles</option>
+                    <option value="25">Within 25 miles</option>
+                    <option value="50">Within 50 miles</option>
+                    <option value="any">Anywhere</option>
                   </select>
                 </label>
                 <label className="form-group w-full sm:w-auto">

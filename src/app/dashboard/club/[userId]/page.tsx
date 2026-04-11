@@ -61,7 +61,9 @@ export default async function ClubProfilePage({ params }: ClubProfilePageProps) 
               <ProfileReturnLink fallbackHref="/dashboard/search?accountType=artist" />
             </Suspense>
           </div>
-          <ClubProfilePageClient club={club} />
+          <Suspense fallback={<div className="mt-5 min-h-[260px]" />}>
+            <ClubProfilePageClient club={club} />
+          </Suspense>
         </section>
       </div>
     </main>

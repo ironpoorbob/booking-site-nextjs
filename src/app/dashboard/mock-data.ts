@@ -6,6 +6,7 @@ type MockArtist = {
   accountType?: string;
   name: string;
   email?: string;
+  artistType?: string;
   city: string;
   lat?: number;
   lng?: number;
@@ -104,6 +105,7 @@ export type SearchResult = {
   summary: string;
   meta: string;
   email?: string;
+  artistType?: string;
   genres?: string[];
   artistDescription?: string;
   bandPicUrl?: string;
@@ -236,6 +238,7 @@ export function getSearchResultsFromMock(accountType: AccountType): SearchResult
         ? `Genre: ${Array.isArray(artist.genre) ? artist.genre.join(", ") : artist.genre}`
         : "Genre not listed",
       email: artist.email,
+      artistType: artist.artistType ?? "musician-band",
       genres: normalizeMockGenres(artist.genre),
       artistDescription: artist.artistDescription ?? "",
       bandPicUrl: artist.bandPicUrl ?? "",
