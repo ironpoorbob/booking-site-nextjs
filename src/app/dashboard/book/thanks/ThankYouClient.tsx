@@ -60,6 +60,15 @@ export default function ThankYouClient() {
 
     return "/dashboard/search?accountType=club-booker";
   }, [searchParams]);
+  const dashboardHref = useMemo(() => {
+    const returnToRaw = searchParams.get("returnTo");
+
+    if (returnToRaw?.startsWith("/dashboard?")) {
+      return returnToRaw;
+    }
+
+    return `/dashboard?${searchParams.toString()}`;
+  }, [searchParams]);
 
   return (
     <main className="min-h-screen py-10">
@@ -81,7 +90,7 @@ export default function ThankYouClient() {
           <Link className="btn-secondary" href={returnTo}>
             Back to Search Results
           </Link>
-          <Link className="btn-primary" href="/dashboard">
+          <Link className="btn-primary" href={dashboardHref}>
             Go to Dashboard
           </Link>
         </div>
