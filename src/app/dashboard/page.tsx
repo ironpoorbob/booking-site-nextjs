@@ -16,7 +16,7 @@ import {
   toSearchString,
 } from "./profile";
 
-type CalendarStatus = "open" | "hold" | "booked" | "need";
+type CalendarStatus = "open" | "hold" | "booked" | "need" | "inquiry";
 
 type CalendarEntry = {
   date: string;
@@ -45,6 +45,7 @@ type CalendarOverride = {
   detail?: string;
   lineup?: string[];
   slotsNeeded?: number;
+  venueInfo?: CalendarEntry["venueInfo"];
   cleared?: boolean;
 };
 
@@ -58,6 +59,21 @@ type ClubDateInquiry = {
   contactLog?: string[];
 };
 
+type BookingRequestDraft = {
+  artistUserId: string;
+  artistName: string;
+  artistEmail?: string;
+  clubName: string;
+  clubCity: string;
+  clubContactEmail: string;
+  date?: string;
+  mode: "date" | "generic";
+};
+
+const DEMO_ARTIST_USER_ID = "artist_001";
+const DEMO_CLUB_USER_ID = "club_004";
+const DEMO_CLUB_NAME = "Bottom of the Hill";
+
 const artistAvailability: CalendarEntry[] = [
   {
     date: "2026-04-02",
@@ -70,6 +86,24 @@ const artistAvailability: CalendarEntry[] = [
     status: "open",
     title: "Open",
     detail: "Available for local club shows or support slots.",
+  },
+  {
+    date: "2026-04-11",
+    status: "inquiry",
+    title: "Gig inquiry received",
+    detail: "Bottom of the Hill reached out about adding Decal to a Friday bill. Review the request and accept the gig if it fits.",
+    venueInfo: {
+      name: "Bottom of the Hill",
+      address: "1233 17th St, San Francisco, CA 94107",
+      phone: "(415) 555-0192",
+      contactName: "Jamie Flores",
+      contactEmail: "bookings@bottomofthehill.com",
+      loadInTime: "6:30 PM",
+      soundcheckTime: "7:15 PM",
+      setTime: "9:00 PM",
+      specialInstructions:
+        "Shared backline is available. Please confirm set length and merch space needs in your reply.",
+    },
   },
   {
     date: "2026-04-18",
@@ -239,6 +273,21 @@ function writeStoredCalendarEntries(
   window.localStorage.setItem(getCalendarStorageKey(accountType, userId), JSON.stringify(entries));
 }
 
+function upsertStoredCalendarEntry(
+  accountType: "artist" | "club-booker",
+  userId: string,
+  nextEntry: CalendarOverride,
+): void {
+  const currentEntries = readStoredCalendarEntries(accountType, userId);
+  const existingIndex = currentEntries.findIndex((entry) => entry.date === nextEntry.date);
+  const nextEntries =
+    existingIndex >= 0
+      ? currentEntries.map((entry, index) => (index === existingIndex ? nextEntry : entry))
+      : [...currentEntries, nextEntry];
+
+  writeStoredCalendarEntries(accountType, userId, nextEntries);
+}
+
 function readStoredClubDateInquiries(userId: string): ClubDateInquiry[] {
   if (typeof window === "undefined") {
     return [];
@@ -333,6 +382,87 @@ function formatContactLogTimestamp(timestamp: string): string {
   }).format(parsed);
 }
 
+function buildBookingRequestMessage(draft: BookingRequestDraft): string {
+  if (draft.date) {
+    return `Hi ${draft.artistName},\n\n${draft.clubName} is interested in booking you for ${formatCalendarDay(draft.date)} in ${draft.clubCity}. Please let us know if you are available and interested.\n\nBest,\n${draft.clubName}`;
+  }
+
+  return `Hi ${draft.artistName},\n\n${draft.clubName} is interested in your project and would like to discuss a potential booking in ${draft.clubCity}. Please let us know if you are open to hearing more details.\n\nBest,\n${draft.clubName}`;
+}
+
+function BookingRequestModal({
+  draft,
+  message,
+  onMessageChange,
+  onClose,
+  onSend,
+}: {
+  draft: BookingRequestDraft;
+  message: string;
+  onMessageChange: (value: string) => void;
+  onClose: () => void;
+  onSend: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true">
+      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-white/20 bg-zinc-950 p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Booking Request</p>
+            <h2 className="mt-2 font-display text-3xl tracking-wider text-white">Review Inquiry</h2>
+            <p className="mt-1 text-zinc-300">Confirm the request details before sending outreach.</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md px-2 py-1 font-display text-3xl leading-none font-bold text-zinc-200 transition-colors hover:bg-white/10 hover:text-white"
+            aria-label="Close booking request"
+          >
+            X
+          </button>
+        </div>
+
+        <div className="mt-6 grid gap-3 md:grid-cols-2">
+          <div className="rounded-xl border border-white/10 bg-black/40 p-4">
+            <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Artist</p>
+            <p className="mt-2 font-semibold text-white">{draft.artistName}</p>
+            <p className="mt-1 text-sm text-zinc-400">{draft.artistEmail || "No contact email listed"}</p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-black/40 p-4">
+            <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Club</p>
+            <p className="mt-2 font-semibold text-white">{draft.clubName}</p>
+            <p className="mt-1 text-sm text-zinc-400">{draft.clubCity}</p>
+            <p className="mt-1 text-sm text-zinc-400">Reply-to: {draft.clubContactEmail}</p>
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-xl border border-white/10 bg-black/40 p-4">
+          <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Requested Date</p>
+          <p className="mt-2 text-zinc-200">{draft.date ? formatCalendarDay(draft.date) : "General booking inquiry"}</p>
+        </div>
+
+        <label className="form-group mt-4">
+          <span>Message</span>
+          <textarea
+            className="form-input mt-2 min-h-36"
+            value={message}
+            onChange={(event) => onMessageChange(event.target.value)}
+          />
+        </label>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button type="button" className="btn-primary" onClick={onSend}>
+            Send Request
+          </button>
+          <button type="button" className="btn-secondary" onClick={onClose}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function getCalendarDays(anchorDate: string): Array<{ iso: string; dayNumber: number; inMonth: boolean }> {
   const base = new Date(`${anchorDate}T00:00:00`);
   const year = base.getFullYear();
@@ -357,6 +487,8 @@ function statusClasses(status: CalendarStatus): string {
   switch (status) {
     case "open":
       return "border-yellow-300/50 bg-yellow-400/20 text-yellow-50";
+    case "inquiry":
+      return "border-sky-300/50 bg-sky-400/20 text-sky-50";
     case "hold":
       return "border-zinc-300/40 bg-zinc-400/15 text-zinc-50";
     case "booked":
@@ -370,6 +502,8 @@ function statusLabel(status: CalendarStatus): string {
   switch (status) {
     case "open":
       return "Open";
+    case "inquiry":
+      return "Inquiry";
     case "hold":
       return "Hold";
     case "booked":
@@ -383,6 +517,8 @@ function statusMarker(status: CalendarStatus): string {
   switch (status) {
     case "open":
       return "O";
+    case "inquiry":
+      return "I";
     case "hold":
       return "H";
     case "booked":
@@ -472,6 +608,12 @@ function buildClubDateStatusCopy(
         detail: "Available for booking and actively looking for a show.",
         slotsNeeded,
       };
+    case "inquiry":
+      return {
+        title: "Inquiry",
+        detail: "A booking inquiry is attached to this date and awaiting a response.",
+        slotsNeeded,
+      };
   }
 }
 
@@ -480,11 +622,19 @@ function CalendarSketch({
   entries,
   accountType,
   userId,
+  faqHref,
+  clubName,
+  clubCity,
+  clubContactEmail,
 }: {
   title: string;
   entries: CalendarEntry[];
   accountType: "artist" | "club-booker";
   userId: string;
+  faqHref?: string;
+  clubName?: string;
+  clubCity?: string;
+  clubContactEmail?: string;
 }) {
   const isClient = useSyncExternalStore(
     () => () => {},
@@ -497,6 +647,8 @@ function CalendarSketch({
   const [detailsDate, setDetailsDate] = useState<string | null>(null);
   const [editingClubEventDate, setEditingClubEventDate] = useState<string | null>(null);
   const [selectedArtistProfileUserId, setSelectedArtistProfileUserId] = useState<string | null>(null);
+  const [bookingRequestDraft, setBookingRequestDraft] = useState<BookingRequestDraft | null>(null);
+  const [bookingRequestMessage, setBookingRequestMessage] = useState("");
   const [draftEntriesByDate, setDraftEntriesByDate] = useState<Record<string, CalendarEntry | null>>({});
   const [draftInquiriesByKey, setDraftInquiriesByKey] = useState<Record<string, ClubDateInquiry>>({});
   const [workflowSearchInput, setWorkflowSearchInput] = useState("");
@@ -605,12 +757,15 @@ function CalendarSketch({
       return;
     }
 
-    const nextEntries = [
-      ...persistedClubDateInquiries.filter(
-        (entry) => !(entry.date === date && entry.artistUserId === nextInquiry.artistUserId),
-      ),
-      nextInquiry,
-    ];
+    const existingIndex = persistedClubDateInquiries.findIndex(
+      (entry) => entry.date === date && entry.artistUserId === nextInquiry.artistUserId,
+    );
+    const nextEntries =
+      existingIndex >= 0
+        ? persistedClubDateInquiries.map((entry, index) =>
+            index === existingIndex ? nextInquiry : entry,
+          )
+        : [...persistedClubDateInquiries, nextInquiry];
 
     writeStoredClubDateInquiries(userId, nextEntries);
     setDraftInquiriesByKey((current) => ({
@@ -620,7 +775,7 @@ function CalendarSketch({
     setCalendarVersion((value) => value + 1);
   }
 
-  function sendInquiryToArtist(date: string, artistUserId: string) {
+  function sendInquiryToArtist(date: string, artistUserId: string, noteOverride?: string) {
     if (accountType !== "club-booker") {
       return;
     }
@@ -638,10 +793,57 @@ function CalendarSketch({
     saveDateInquiry(date, {
       date,
       artistUserId,
-      note: existingInquiry?.note ?? `Sent booking inquiry for ${formatCalendarDay(date)}.`,
+      note: noteOverride?.trim() || existingInquiry?.note || `Sent booking inquiry for ${formatCalendarDay(date)}.`,
       status: existingInquiry?.status === "accepted" ? "accepted" : "sent",
       contactLog: [...(existingInquiry?.contactLog ?? []), `${timestamp}|${nextLogEntry}`],
     });
+
+    if (userId === DEMO_CLUB_USER_ID && artistUserId === DEMO_ARTIST_USER_ID) {
+      upsertStoredCalendarEntry("artist", DEMO_ARTIST_USER_ID, {
+        date,
+        status: "inquiry",
+        title: "Gig inquiry received",
+        detail: `${DEMO_CLUB_NAME} reached out about booking Decal for ${formatCalendarDay(date)}. Review the request and accept the gig if it fits.`,
+        venueInfo: {
+          name: clubName || DEMO_CLUB_NAME,
+          address: "1233 17th St, San Francisco, CA 94107",
+          phone: "(415) 555-0192",
+          contactName: "Jamie Flores",
+          contactEmail: clubContactEmail || "bottomofthehillbooking@gmail.com",
+          loadInTime: "6:30 PM",
+          soundcheckTime: "7:15 PM",
+          setTime: "9:00 PM",
+          specialInstructions:
+            "Shared backline is available. Please confirm set length and merch space needs in your reply.",
+        },
+      });
+    }
+  }
+
+  function openBookingRequest(date: string, artistUserId: string) {
+    if (accountType !== "club-booker" || !clubName || !clubCity || !clubContactEmail) {
+      return;
+    }
+
+    const artist = artistResults.find((entry) => entry.userId === artistUserId);
+
+    if (!artist) {
+      return;
+    }
+
+    const draft: BookingRequestDraft = {
+      artistUserId,
+      artistName: artist.name,
+      artistEmail: artist.email,
+      clubName,
+      clubCity,
+      clubContactEmail,
+      date,
+      mode: "date",
+    };
+
+    setBookingRequestDraft(draft);
+    setBookingRequestMessage(buildBookingRequestMessage(draft));
   }
 
   function saveCalendarEntry(
@@ -649,7 +851,7 @@ function CalendarSketch({
     nextStatus: CalendarStatus,
     nextTitle: string,
     nextDetail: string,
-    extra?: Pick<CalendarOverride, "lineup" | "slotsNeeded">,
+    extra?: Pick<CalendarOverride, "lineup" | "slotsNeeded" | "venueInfo">,
   ) {
     if (!userId) {
       return;
@@ -664,6 +866,7 @@ function CalendarSketch({
         detail: nextDetail,
         lineup: extra?.lineup,
         slotsNeeded: extra?.slotsNeeded,
+        venueInfo: extra?.venueInfo,
       },
     ];
 
@@ -677,6 +880,7 @@ function CalendarSketch({
         detail: nextDetail,
         lineup: extra?.lineup,
         slotsNeeded: extra?.slotsNeeded,
+        venueInfo: extra?.venueInfo,
       },
     }));
     setCalendarVersion((value) => value + 1);
@@ -735,6 +939,27 @@ function CalendarSketch({
       note: existingInquiry?.note ?? `${artist.name} was confirmed to this date.`,
       status: "accepted",
     });
+
+    if (userId === DEMO_CLUB_USER_ID && artistUserId === DEMO_ARTIST_USER_ID) {
+      upsertStoredCalendarEntry("artist", DEMO_ARTIST_USER_ID, {
+        date,
+        status: "booked",
+        title: "Booked",
+        detail: `Confirmed at ${DEMO_CLUB_NAME} with load-in at 6:30 PM.`,
+        venueInfo: {
+          name: DEMO_CLUB_NAME,
+          address: "1233 17th St, San Francisco, CA 94107",
+          phone: "(415) 555-0192",
+          contactName: "Jamie Flores",
+          contactEmail: "bottomofthehillbooking@gmail.com",
+          loadInTime: "6:30 PM",
+          soundcheckTime: "7:15 PM",
+          setTime: "9:00 PM",
+          specialInstructions:
+            "Shared backline is available. Please confirm set length and merch space needs in your reply.",
+        },
+      });
+    }
     setDetailsDate(date);
     setEditingDate(null);
   }
@@ -767,7 +992,13 @@ function CalendarSketch({
     const currentStatus = existingEntry?.status ?? null;
     const visibleArtists = workflowSearchQuery ? workflowArtists.slice(0, 5) : [];
     const targetBandCount = getClubTargetBandCount(existingEntry);
+    const effectiveStatus = existingEntry?.status ?? "need";
+    const eventStatusCopy = buildClubDateStatusCopy(effectiveStatus, targetBandCount, existingEntry?.lineup);
     const visibleDateInquiries = dateInquiries.filter((inquiry) => {
+      if (inquiry.status === "declined") {
+        return false;
+      }
+
       const artist = artistResults.find((entry) => entry.userId === inquiry.artistUserId);
       return !(artist && existingEntry?.lineup?.includes(artist.name));
     });
@@ -780,21 +1011,11 @@ function CalendarSketch({
     return (
       <>
         <div className="mt-6 space-y-3">
-          <div className={`rounded-xl border px-4 py-3 ${statusClasses(currentStatus ?? "need")}`}>
-            <p className="text-xs tracking-[0.12em] uppercase">Status</p>
-            {existingEntry ? (
-              <>
-                <p className="mt-1 text-sm uppercase tracking-[0.12em]">{statusLabel(existingEntry.status)}</p>
-                <p className="mt-1 font-semibold">{existingEntry.title}</p>
-              </>
-            ) : (
-              <>
-                <p className="mt-1 text-sm uppercase tracking-[0.12em]">Need Bands</p>
-                <p className="mt-1 font-semibold">0 of {targetBandCount} bands booked</p>
-              </>
-            )}
+          <div className={`rounded-xl border px-4 py-3 ${statusClasses(effectiveStatus)}`}>
+            <p className="text-xs tracking-[0.12em] uppercase">Event Status: {statusLabel(effectiveStatus)}</p>
+            <p className="mt-1 font-display text-2xl tracking-wider text-current">{eventStatusCopy.title}</p>
           </div>
-          <p className="text-sm font-semibold text-white">Date status</p>
+          <p className="text-sm font-semibold text-white">Update Status</p>
           <div className="grid gap-3 sm:grid-cols-3">
             <button
               type="button"
@@ -864,7 +1085,13 @@ function CalendarSketch({
               onChange={(event) => {
                 const parsed = Number(event.target.value);
                 const nextTarget = Math.max(1, Number.isFinite(parsed) ? parsed : 3);
-                const nextStatus = existingEntry?.status ?? "need";
+                const confirmedCount = existingEntry?.lineup?.length ?? 0;
+                const nextStatus =
+                  existingEntry?.status === "hold"
+                    ? "hold"
+                    : confirmedCount >= nextTarget
+                      ? "booked"
+                      : "need";
                 const nextCopy = buildClubDateStatusCopy(nextStatus, nextTarget, existingEntry?.lineup);
 
                 saveCalendarEntry(date, nextStatus, nextCopy.title, nextCopy.detail, {
@@ -878,7 +1105,7 @@ function CalendarSketch({
 
         {existingEntry ? (
           <div className="mt-4 rounded-xl border border-white/10 bg-black/40 p-4">
-            <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Details</p>
+            <h4 className="font-display text-2xl tracking-wider text-white">Details</h4>
             <p className="mt-2 text-zinc-300">{existingEntry.detail}</p>
           </div>
         ) : null}
@@ -892,7 +1119,7 @@ function CalendarSketch({
         >
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Confirmed Lineup</p>
+              <h4 className="font-display text-2xl tracking-wider text-white">Confirmed Lineup</h4>
               <p className="mt-2 text-sm text-zinc-300">
                 Edit the current bill by removing bands or adding more through inquiries and search.
               </p>
@@ -943,10 +1170,10 @@ function CalendarSketch({
           )}
         </div>
 
-        <div className="mt-6 rounded-xl border border-white/10 bg-black/40 p-4">
+        <div className="mt-6 rounded-xl border border-sky-300/30 bg-sky-400/10 p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Inquiry Status</p>
+              <h4 className="font-display text-2xl tracking-wider text-white">Inquiry Status</h4>
               <p className="mt-2 text-sm text-zinc-300">
                 Track outreach for this date and confirm bands as they accept.
               </p>
@@ -1028,6 +1255,15 @@ function CalendarSketch({
                           Confirm to Date
                         </button>
                       ) : null}
+                      {inquiry.status !== "declined" && !isConfirmed ? (
+                        <button
+                          type="button"
+                          className="btn-secondary"
+                          onClick={() => saveDateInquiry(date, { ...inquiry, status: "declined" })}
+                        >
+                          Mark Unavailable
+                        </button>
+                      ) : null}
                     </div>
                   </li>
                 );
@@ -1038,8 +1274,11 @@ function CalendarSketch({
           )}
         </div>
 
-        <div className="mt-6 rounded-xl border border-white/10 bg-black/40 p-4">
-          <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Search Bands for This Date</p>
+        <div className="mt-6 rounded-xl border border-violet-300/30 bg-violet-400/10 p-4">
+          <h4 className="font-display text-2xl tracking-wider text-white">Search Bands for This Date</h4>
+          <p className="mt-2 text-sm text-zinc-300">
+            Find artists for this date, review profiles, and send new outreach.
+          </p>
           <form
             className="mt-4 flex flex-col gap-3 sm:flex-row"
             onSubmit={(event) => {
@@ -1097,7 +1336,7 @@ function CalendarSketch({
                       <button
                         type="button"
                         className="btn-primary"
-                        onClick={() => sendInquiryToArtist(date, artist.userId)}
+                        onClick={() => openBookingRequest(date, artist.userId)}
                       >
                         {inquiry ? "Send Follow-Up" : "Send Inquiry"}
                       </button>
@@ -1141,6 +1380,13 @@ function CalendarSketch({
             className="btn-secondary"
             onClick={() => {
               if (mode === "create") {
+                if (!existingEntry) {
+                  const nextCopy = buildClubDateStatusCopy("need", targetBandCount, []);
+                  saveCalendarEntry(date, "need", nextCopy.title, nextCopy.detail, {
+                    lineup: [],
+                    slotsNeeded: nextCopy.slotsNeeded,
+                  });
+                }
                 setEditingDate(null);
               } else {
                 setDetailsDate(null);
@@ -1174,6 +1420,15 @@ function CalendarSketch({
         <div className="mt-4 rounded-xl border border-white/10 bg-black/40 p-4">
           <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Details</p>
           <p className="mt-2 text-zinc-300">{entry.detail}</p>
+          {entry.slotsNeeded === 0 ? (
+            <p className="mt-3 text-sm text-zinc-300">
+              Don&apos;t forget to checkout the FAQ for event to-dos{" "}
+              <Link className="text-sky-300 underline-offset-2 hover:underline" href={faqHref || "/faq"}>
+                here
+              </Link>
+              .
+            </p>
+          ) : null}
         </div>
 
         <div
@@ -1246,9 +1501,14 @@ function CalendarSketch({
         </div>
         <div className="flex flex-wrap gap-2 text-xs uppercase tracking-[0.12em]">
           {accountType === "artist" ? (
-            <span className="rounded-full border border-yellow-300/50 bg-yellow-400/20 px-3 py-1 text-yellow-50">
-              Open
-            </span>
+            <>
+              <span className="rounded-full border border-yellow-300/50 bg-yellow-400/20 px-3 py-1 text-yellow-50">
+                Open
+              </span>
+              <span className="rounded-full border border-sky-300/50 bg-sky-400/20 px-3 py-1 text-sky-50">
+                Inquiry
+              </span>
+            </>
           ) : (
             <>
               <span className="rounded-full border border-zinc-300/40 bg-zinc-400/15 px-3 py-1 text-zinc-50">
@@ -1421,7 +1681,7 @@ function CalendarSketch({
             <div className="mt-6 space-y-3">
               <p className="text-sm font-semibold text-white">Set status for this date</p>
               {accountType === "artist" ? (
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-3 sm:grid-cols-3">
                   <button
                     type="button"
                     className="rounded-xl border border-yellow-300/50 bg-yellow-400/20 px-4 py-3 text-left text-yellow-50"
@@ -1435,6 +1695,20 @@ function CalendarSketch({
                     }
                   >
                     Open
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-xl border border-sky-300/50 bg-sky-400/20 px-4 py-3 text-left text-sky-50"
+                    onClick={() =>
+                      saveCalendarEntry(
+                        editingDate,
+                        "inquiry",
+                        "Gig inquiry received",
+                        "A club reached out about this date. Review the request details and accept if it fits.",
+                      )
+                    }
+                  >
+                    Inquiry
                   </button>
                   <button
                     type="button"
@@ -1505,6 +1779,17 @@ function CalendarSketch({
                   <p className="text-xs tracking-[0.12em] text-zinc-400 uppercase">Details</p>
                   <p className="mt-2 text-zinc-300">{detailsEntry.detail}</p>
                 </div>
+                {detailsEntry.status === "inquiry" && detailsEntry.venueInfo ? (
+                  <div className="mt-4 rounded-xl border border-sky-300/30 bg-sky-400/10 p-4">
+                    <h4 className="font-display text-2xl tracking-wider text-white">Club Request</h4>
+                    <p className="mt-2 text-zinc-200">
+                      {detailsEntry.venueInfo.name} wants to book Decal for {formatCalendarDay(detailsEntry.date)}.
+                    </p>
+                    <p className="mt-2 text-sm text-zinc-300">
+                      Contact: {detailsEntry.venueInfo.contactName} · {detailsEntry.venueInfo.contactEmail}
+                    </p>
+                  </div>
+                ) : null}
               </>
             )}
 
@@ -1540,6 +1825,54 @@ function CalendarSketch({
 
             {accountType === "artist" ? (
               <div className="mt-5 flex flex-wrap gap-3">
+                {detailsEntry.status === "inquiry" &&
+                detailsEntry.title !== "Awaiting Club Confirmation" ? (
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={() => {
+                      saveCalendarEntry(
+                        detailsEntry.date,
+                        "inquiry",
+                        "Awaiting Club Confirmation",
+                        detailsEntry.venueInfo
+                          ? `You accepted ${detailsEntry.venueInfo.name}'s request for this date. Waiting for the club to confirm you to the bill.`
+                          : "You accepted this booking inquiry and are waiting for club confirmation.",
+                        {
+                          venueInfo: detailsEntry.venueInfo,
+                        },
+                        );
+                      if (
+                        userId === DEMO_ARTIST_USER_ID &&
+                        detailsEntry.venueInfo?.name === DEMO_CLUB_NAME
+                      ) {
+                        const clubDateInquiries = readStoredClubDateInquiries(DEMO_CLUB_USER_ID);
+                        const inquiryIndex = clubDateInquiries.findIndex(
+                          (entry) =>
+                            entry.date === detailsEntry.date && entry.artistUserId === DEMO_ARTIST_USER_ID,
+                        );
+                        const acceptedInquiry: ClubDateInquiry = {
+                          date: detailsEntry.date,
+                          artistUserId: DEMO_ARTIST_USER_ID,
+                          note: "Decal accepted the booking request for this date and is waiting for club confirmation.",
+                          status: "accepted",
+                        };
+                        const nextClubDateInquiries =
+                          inquiryIndex >= 0
+                            ? clubDateInquiries.map((entry, index) =>
+                                index === inquiryIndex
+                                  ? { ...entry, note: acceptedInquiry.note, status: "accepted" as InquiryStatus }
+                                  : entry,
+                              )
+                            : [...clubDateInquiries, acceptedInquiry];
+                        writeStoredClubDateInquiries(DEMO_CLUB_USER_ID, nextClubDateInquiries);
+                      }
+                      setDetailsDate(detailsEntry.date);
+                    }}
+                  >
+                    Accept Gig
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   className="btn-secondary"
@@ -1562,6 +1895,28 @@ function CalendarSketch({
           onClose={() => setSelectedArtistProfileUserId(null)}
         />
       ) : null}
+      {bookingRequestDraft ? (
+        <BookingRequestModal
+          draft={bookingRequestDraft}
+          message={bookingRequestMessage}
+          onMessageChange={setBookingRequestMessage}
+          onClose={() => {
+            setBookingRequestDraft(null);
+            setBookingRequestMessage("");
+          }}
+          onSend={() => {
+            if (bookingRequestDraft.date) {
+              sendInquiryToArtist(
+                bookingRequestDraft.date,
+                bookingRequestDraft.artistUserId,
+                bookingRequestMessage,
+              );
+            }
+            setBookingRequestDraft(null);
+            setBookingRequestMessage("");
+          }}
+        />
+      ) : null}
     </section>
   );
 }
@@ -1579,6 +1934,8 @@ function DashboardPageContent() {
   const [searchModalDistance, setSearchModalDistance] = useState("25");
   const [searchModalArtistType, setSearchModalArtistType] = useState("musician-band");
   const [selectedSearchArtistUserId, setSelectedSearchArtistUserId] = useState<string | null>(null);
+  const [genericBookingRequestDraft, setGenericBookingRequestDraft] = useState<BookingRequestDraft | null>(null);
+  const [genericBookingRequestMessage, setGenericBookingRequestMessage] = useState("");
 
   const profile = useMemo(() => {
     const raw = toRawSearchParams(new URLSearchParams(searchParams.toString()));
@@ -1728,6 +2085,26 @@ function DashboardPageContent() {
     setSearchModalMusicType(searchModalMusicTypeInput);
     setSearchModalDistance(searchModalDistanceInput);
     setSearchModalArtistType(searchModalArtistTypeInput);
+  }
+  function openGenericBookingRequest(artistUserId: string) {
+    const artist = allArtistResults.find((entry) => entry.userId === artistUserId);
+
+    if (!artist || profile.accountType !== "club-booker") {
+      return;
+    }
+
+    const draft: BookingRequestDraft = {
+      artistUserId,
+      artistName: artist.name,
+      artistEmail: artist.email,
+      clubName: profile.venueName,
+      clubCity: profile.location,
+      clubContactEmail: profile.bookingContactEmail || profile.email,
+      mode: "generic",
+    };
+
+    setGenericBookingRequestDraft(draft);
+    setGenericBookingRequestMessage(buildBookingRequestMessage(draft));
   }
 
   if (profile.accountType === "club-booker" && !isClient) {
@@ -2019,6 +2396,13 @@ function DashboardPageContent() {
                           >
                             View Profile
                           </button>
+                          <button
+                            type="button"
+                            className="btn-primary"
+                            onClick={() => openGenericBookingRequest(artist.userId)}
+                          >
+                            Send Booking Request
+                          </button>
                         </div>
                       </div>
                     ))
@@ -2039,6 +2423,21 @@ function DashboardPageContent() {
             onClose={() => setSelectedSearchArtistUserId(null)}
           />
         ) : null}
+        {genericBookingRequestDraft ? (
+          <BookingRequestModal
+            draft={genericBookingRequestDraft}
+            message={genericBookingRequestMessage}
+            onMessageChange={setGenericBookingRequestMessage}
+            onClose={() => {
+              setGenericBookingRequestDraft(null);
+              setGenericBookingRequestMessage("");
+            }}
+            onSend={() => {
+              setGenericBookingRequestDraft(null);
+              setGenericBookingRequestMessage("");
+            }}
+          />
+        ) : null}
 
         <CalendarSketch
           title={
@@ -2049,6 +2448,12 @@ function DashboardPageContent() {
           entries={availabilityEntries}
           accountType={profile.accountType}
           userId={profile.userId}
+          faqHref={`/faq?${profileQuery}`}
+          clubName={profile.accountType === "club-booker" ? profile.venueName : undefined}
+          clubCity={profile.accountType === "club-booker" ? profile.location : undefined}
+          clubContactEmail={
+            profile.accountType === "club-booker" ? profile.bookingContactEmail || profile.email : undefined
+          }
         />
 
         <section className="rounded-2xl border border-white/15 bg-black/70 p-6 md:p-8">
